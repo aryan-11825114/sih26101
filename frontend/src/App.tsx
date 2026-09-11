@@ -17,7 +17,6 @@ import { CertificationsAchievementsView } from './pages/CertificationsAchievemen
 import { ResumePortfolioView } from './pages/ResumePortfolioView';
 import { AICareerAdvisorView } from './pages/AICareerAdvisorView';
 
-import { ExperiencePassportView } from './pages/ExperiencePassportView';
 import { TrustVerificationView } from './pages/TrustVerificationView';
 import { AIHelpdeskView } from './pages/AIHelpdeskView';
 import { FacultyDashboard } from './pages/FacultyDashboard';
@@ -517,10 +516,6 @@ export const App: React.FC = () => {
                     student={student}
                     onNavigateTab={(t) => setActiveTab(t)}
                   />
-                )}
-
-                {activeTab === 'passport' && (
-                  <ExperiencePassportView records={passport} />
                 )}
 
                 {activeTab === 'trust' && (

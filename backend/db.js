@@ -506,16 +506,164 @@ function getDefaultData() {
   };
 }
 
-// In-Memory store loader (strictly in memory runtime, never written to disk)
+// Active Database state loaded from PostgreSQL via pgPool
 let memoryDb = null;
+let isLoadingFromPg = false;
 
+// Asynchronously load database contents directly from PostgreSQL via pgPool
+async function loadDatabaseFromPg() {
+  const pool = getPgPool();
+  const dbState = {
+    users: [],
+    students: [],
+    mentors: [],
+    companies: [],
+    gigs: [],
+    gig_applications: [],
+    experience_records: [],
+    helpdesk_tickets: [],
+    jobs: [],
+    mentor_bookings: [],
+    ghost_tasks: [],
+    mou_requests: [],
+    faculty_swaps: [],
+    faqs: []
+  };
+
+  if (!pool) {
+    if (!memoryDb) {
+      memoryDb = dbState;
+    }
+    return memoryDb;
+  }
+
+  try {
+    isLoadingFromPg = true;
+    
+    // Query PostgreSQL tables in parallel
+    const [
+      usersRes,
+      studentsRes,
+      mentorsRes,
+      companiesRes,
+      gigsRes,
+      gigAppsRes,
+      expRes,
+      ticketsRes,
+      jobsRes,
+      bookingsRes
+    ] = await Promise.all([
+      pool.query("SELECT * FROM users ORDER BY id ASC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM students ORDER BY id ASC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM mentors ORDER BY id ASC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM companies ORDER BY id ASC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM gigs ORDER BY id DESC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM gig_applications ORDER BY id DESC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM experience_records ORDER BY id DESC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM helpdesk_tickets ORDER BY id DESC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM jobs ORDER BY id DESC").catch(() => ({ rows: [] })),
+      pool.query("SELECT * FROM mentor_bookings ORDER BY id DESC").catch(() => ({ rows: [] }))
+    ]);
+
+    dbState.users = usersRes.rows || [];
+    dbState.students = studentsRes.rows || [];
+    dbState.mentors = (mentorsRes.rows || []).map(m => ({
+      ...m,
+      experience: Number(m.experience_years || m.experience || 5),
+      match: Number(m.match || 92),
+      availability: m.availability !== false,
+      capsuleSlots: Array.isArray(m.capsule_slots) ? m.capsule_slots : ["Today 4:00 PM", "Tomorrow 11:30 AM", "Friday 5:15 PM"],
+      specialization: Array.isArray(m.specialization) ? m.specialization : ["System Design", "Cloud Native", "Node.js"]
+    }));
+    dbState.companies = companiesRes.rows || [];
+    dbState.gigs = (gigsRes.rows || []).map(g => ({
+      ...g,
+      hours: Number(g.duration_hours || g.hours || 4),
+      payment: Number(g.payment || 2000),
+      applicantCount: Number(g.applicant_count || g.applicantCount || 0),
+      skill: g.required_skill || g.skill || "Web Development"
+    }));
+    dbState.gig_applications = gigAppsRes.rows || [];
+    dbState.experience_records = expRes.rows || [];
+    dbState.helpdesk_tickets = ticketsRes.rows || [];
+    dbState.jobs = (jobsRes.rows || []).map(j => {
+      let parsedSkills = ['Engineering'];
+      if (Array.isArray(j.required_skills)) {
+        parsedSkills = j.required_skills;
+      } else if (typeof j.required_skills === 'string') {
+        parsedSkills = j.required_skills.replace(/[{}"']/g, '').split(',').map(s => s.trim()).filter(Boolean);
+      }
+      return {
+        id: `j${j.id}`,
+        numericId: j.id,
+        title: j.title || 'Software Engineer',
+        company: j.company || 'Enterprise Partner',
+        company_id: j.company_id || 1,
+        location: j.location || 'Remote',
+        type: j.type || 'Full-Time',
+        duration: j.duration || '6 Months',
+        stipend: j.stipend || 'Competitive',
+        openings: Number(j.openings || 1),
+        required_skills: parsedSkills,
+        skills: parsedSkills,
+        requiredSkills: parsedSkills,
+        eligibility: j.eligibility || 'All Qualified Candidates',
+        description: j.description || 'Job role posted on Ladder Talent Network.',
+        deadline: j.deadline || 'Open',
+        status: j.status || 'Active',
+        apps: Number(j.apps || 0),
+        applications: Number(j.apps || 0),
+        created_at: j.created_at || new Date().toISOString()
+      };
+    });
+    dbState.mentor_bookings = bookingsRes.rows || [];
+
+    memoryDb = dbState;
+    console.log(`✅ Loaded database from PostgreSQL via pgPool (${dbState.users.length} users, ${dbState.jobs.length} jobs, ${dbState.mentors.length} mentors).`);
+    return memoryDb;
+  } catch (err) {
+    console.warn("⚠️ Error loading from pgPool:", err.message);
+    if (!memoryDb) memoryDb = dbState;
+    return memoryDb;
+  } finally {
+    isLoadingFromPg = false;
+  }
+}
+
+// Load database using pgPool
 function loadDatabase() {
   if (memoryDb) return memoryDb;
-  memoryDb = getDefaultData();
+  
+  // Initialize container
+  memoryDb = {
+    users: [],
+    students: [],
+    mentors: [],
+    companies: [],
+    gigs: [],
+    gig_applications: [],
+    experience_records: [],
+    helpdesk_tickets: [],
+    jobs: [],
+    mentor_bookings: [],
+    ghost_tasks: [],
+    mou_requests: [],
+    faculty_swaps: [],
+    faqs: []
+  };
+
+  // Asynchronously trigger population from PostgreSQL pgPool
+  const pool = getPgPool();
+  if (pool && !isLoadingFromPg) {
+    loadDatabaseFromPg().catch(err => {
+      console.warn("Notice loading PostgreSQL database:", err.message);
+    });
+  }
+
   return memoryDb;
 }
 
-// Initialize PostgreSQL if available
+// Initialize PostgreSQL schema and load database from pgPool
 async function initializeDatabase() {
   const pool = getPgPool();
   if (!pool || pgInitialized) return;
@@ -526,8 +674,11 @@ async function initializeDatabase() {
       const sql = fs.readFileSync(schemaPath, "utf8");
       await pool.query(sql);
       pgInitialized = true;
-      console.log("✅ PostgreSQL schema & seed data verified/initialized successfully.");
+      console.log("✅ PostgreSQL schema verified/initialized successfully.");
     }
+
+    // Load database directly from pgPool
+    await loadDatabaseFromPg();
   } catch (err) {
     console.error("⚠️ PostgreSQL schema initialization notice:", err.message);
   }
@@ -1403,6 +1554,8 @@ module.exports = {
   createFacultySwap,
   getFaqs,
   query,
+  getPgPool,
+  loadDatabaseFromPg,
   checkDatabaseConnection,
   initializeDatabase
 };

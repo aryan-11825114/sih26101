@@ -270,20 +270,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </button>
 
                   <button
-                    id="nav-passport"
-                    onClick={() => handleTabClick('passport')}
-                    title="Experience Passport"
-                    className={`w-full flex items-center ${collapsed ? 'justify-center w-10 h-10 mx-auto px-0 py-0 gap-0' : 'gap-3 px-2.5 py-2'} rounded-xl text-[13px] font-semibold transition-all ${
-                      activeTab === 'passport'
-                        ? 'bg-[#7C5CFC]/20 text-[#C4B5FD] border border-[#7C5CFC]/30 shadow-sm font-bold'
-                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <ShieldCheck className="w-4 h-4 text-indigo-400 shrink-0" />
-                    {!collapsed && <span className="truncate">Experience Passport</span>}
-                  </button>
-
-                  <button
                     id="nav-advisor"
                     onClick={() => handleTabClick('advisor')}
                     title="AI Career Advisor"

@@ -81,7 +81,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#7C5CFC] to-[#00D9FF] hover:opacity-95 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-purple-500/25 transition-all cursor-pointer"
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Explore Learning Tracks & Hub</span>
+                <span>lore Learning Tracks & Hub</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
@@ -432,44 +432,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               <p className="text-[11px] text-slate-400 mt-0.5">Sync verified telemetry to your ATS-ready resume.</p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* 5. RECENT EXPERIENCE PASSPORT VERIFICATIONS */}
-      <div className="p-5 rounded-2xl bg-[#0B1033] border border-[#1C265E]">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-sm font-bold text-white">Experience Passport · Verified Ledger</h2>
-          </div>
-          <button
-            onClick={() => onNavigate('passport')}
-            className="text-xs font-bold text-[#A78BFA] hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
-          >
-            <span>Open Passport ({passport.length} Badges)</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          {passport.slice(0, 2).map((item) => (
-            <div key={item.id} className="p-3.5 rounded-xl bg-[#0E1538] border border-[#1E2964] flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-300 mt-0.5">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold text-white truncate">{item.title}</p>
-                  <span className="text-[10px] font-black text-emerald-400">{item.score}/100</span>
-                </div>
-                <p className="text-[11px] text-slate-400">{item.company} · {item.experience_type}</p>
-                <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                  <span>Hash: {item.hash?.slice(0, 16) || '0x7f4b8921e90a88...'}</span>
-                  <span className="text-emerald-400 font-bold">✓ Blockchain Verified</span>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
