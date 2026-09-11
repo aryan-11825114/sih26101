@@ -190,6 +190,65 @@ function devApiPlugin(): Plugin {
         }
 
         // 9. Helpdesk FAQ & Tickets & Live AI Chat
+        if (url === '/api/chat' && req.method === 'POST') {
+          const body = await readBody();
+          const messages = body.messages || [];
+          const apiKey = process.env.GEMINI_API_KEY;
+
+          res.setHeader('Content-Type', 'text/event-stream');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.setHeader('Connection', 'keep-alive');
+
+          let streamed = false;
+          if (apiKey && apiKey.trim().length > 5) {
+            try {
+              const { GoogleGenAI } = await import('@google/genai');
+              const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+              const history = messages.slice(0, -1).map((m: any) => ({
+                role: m.role === 'bot' || m.role === 'model' || m.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: m.text }]
+              }));
+              const userMessage = messages.length > 0 ? messages[messages.length - 1].text : 'Hello';
+
+              const chat = ai.chats.create({
+                model: 'gemini-2.5-flash-lite',
+                config: {
+                  systemInstruction: 'You are the Ladder AI Faculty Advisor for CSIT HOD Dr. Arvind Sharma. Help with student intervention, workshops, mentorship, and academic planning. Respond professionally, structured, and concisely, grounding answers in CSIT department context.',
+                  maxOutputTokens: 600
+                },
+                history
+              });
+
+              const stream = await chat.sendMessageStream({ message: userMessage });
+              for await (const chunk of stream) {
+                if (chunk.text) {
+                  res.write(`data: ${JSON.stringify({ text: chunk.text })}\n\n`);
+                }
+              }
+              res.write('data: [DONE]\n\n');
+              streamed = true;
+            } catch (err: any) {
+              console.warn('Gemini chat streaming error:', err.message);
+            }
+          }
+
+          if (!streamed) {
+            const lastMsg = messages.length > 0 ? messages[messages.length - 1].text.toLowerCase() : '';
+            let facultyReply = 'Based on current CSIT department metrics:\n\n- **Curriculum Alignment**: 84% aligned with Industry 4.0 standards\n- **Active Mentorship Capsules**: 14 scheduled this week\n- **At-Risk Cohort**: 6 students recommended for remedial workshops\n\nWould you like me to draft an intervention plan or initiate faculty exchange requests?';
+            if (lastMsg.includes('risk') || lastMsg.includes('student')) {
+              facultyReply = 'Identified **6 students** in the 2025-29 batch requiring academic intervention in Systems Programming and Algorithms. Recommended actions:\n\n1. Assign 15-Minute Micro-Capsules with senior industry mentors.\n2. Enroll in remedial Ghost Simulation tasks (Zero-NDA).\n3. Schedule a faculty advisory review.';
+            } else if (lastMsg.includes('mentor') || lastMsg.includes('capsule')) {
+              facultyReply = 'Mentorship Summary for CSIT:\n\n- **Total Completed Sprints**: 38 sessions\n- **Average Rating**: 4.9/5.0\n- **Top Mentors**: Amit Verma (TCS), Neha Deshmukh (Infosys)\n- **Upcoming**: 8 scheduled capsules for this weekend.';
+            } else if (lastMsg.includes('curriculum') || lastMsg.includes('compliance')) {
+              facultyReply = 'Curriculum Compliance Status:\n\n- **AICTE Model Curriculum Alignment**: 91%\n- **Hands-on Lab Quotient**: 45% of total credits\n- **Recommended Addition**: Docker containerization and PostgreSQL index tuning modules.';
+            }
+            res.write(`data: ${JSON.stringify({ text: facultyReply })}\n\n`);
+            res.write('data: [DONE]\n\n');
+          }
+
+          return res.end();
+        }
+
         if (url.startsWith('/api/ai/helpdesk/chat')) {
           if (req.method === 'POST') {
             const body = await readBody();

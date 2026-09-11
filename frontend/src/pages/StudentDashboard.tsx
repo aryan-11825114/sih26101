@@ -1,79 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Compass, 
   Sparkles, 
   ArrowRight, 
-  Briefcase, 
-  Users, 
   ShieldCheck, 
   CheckCircle2, 
+  CheckCircle,
   TrendingUp, 
   ExternalLink,
   ChevronRight,
   Code,
   Dna,
-  Clock,
   Award,
-  AlertTriangle,
   Zap,
   BookOpen,
-  MapPin,
-  Building2,
-  Calendar,
-  CheckCircle,
+  FileText,
   FileCheck2,
+  AlertTriangle,
+  Target,
   BarChart3,
   Bot
 } from 'lucide-react';
-import { StudentProfile, Mentor, Gig, PassportRecord, JobOpportunity } from '../types';
+import { StudentProfile, PassportRecord } from '../types';
 import { SkillTwinAndQuests } from '../components/SkillTwinAndQuests';
 import { 
   getStudentSkills, 
   getSkillGaps, 
-  getOpportunities, 
-  fetchLiveOpportunities,
-  calculateReadinessMetrics, 
-  calculateOpportunityMatch 
+  calculateReadinessMetrics
 } from '../services/studentCareerService';
 
 interface StudentDashboardProps {
   student: StudentProfile | null;
-  mentors: Mentor[];
-  gigs: Gig[];
   passport: PassportRecord[];
   onNavigate: (tab: string) => void;
   onOpenProfile: () => void;
-  onBookMentor: (mentor: Mentor) => void;
-  onApplyGig: (gig: Gig) => void;
-  onApplyJob?: (job: JobOpportunity) => void;
 }
 
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   student,
-  mentors,
-  gigs,
   passport,
   onNavigate,
-  onOpenProfile,
-  onBookMentor,
-  onApplyGig,
-  onApplyJob
+  onOpenProfile
 }) => {
   const [skills, setSkills] = useState(() => getStudentSkills());
   const [skillGaps, setSkillGaps] = useState(() => getSkillGaps());
-  const [jobs, setJobs] = useState<JobOpportunity[]>(() => getOpportunities());
 
   useEffect(() => {
     setSkills(getStudentSkills());
     setSkillGaps(getSkillGaps());
-    setJobs(getOpportunities());
-
-    // Fetch live opportunities from backend/database
-    fetchLiveOpportunities().then(live => {
-      if (live && live.length > 0) {
-        setJobs(live);
-      }
-    });
   }, []);
 
   const readiness = React.useMemo(() => calculateReadinessMetrics(skills), [skills]);
@@ -104,11 +77,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
             <div className="flex flex-wrap items-center gap-3 mt-5">
               <button
-                onClick={() => onNavigate('jobs')}
+                onClick={() => onNavigate('learning')}
                 className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#7C5CFC] to-[#00D9FF] hover:opacity-95 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-purple-500/25 transition-all cursor-pointer"
               >
-                <Briefcase className="w-3.5 h-3.5" />
-                <span>Explore Placements & Jobs</span>
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Explore Learning Tracks & Hub</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
@@ -313,114 +286,104 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       </div>
 
-      {/* 3. RECOMMENDED OPPORTUNITIES (JOBS & INTERNSHIPS) */}
+      {/* 3. TARGET ROLE COMPETENCY ROADMAPS & LEARNING TRACKS */}
       <div className="p-5 rounded-2xl bg-[#0B1033] border border-[#1C265E] shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-              <Briefcase className="w-4 h-4" />
+              <BookOpen className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white">Recommended Opportunities for You</h2>
-              <p className="text-[11px] text-slate-400">Deterministic algorithmic match based on your verified skills</p>
+              <h2 className="text-sm font-bold text-white">Target Role Competency Roadmaps & Learning Tracks</h2>
+              <p className="text-[11px] text-slate-400">Curated industry-grade learning paths and hands-on skill sprints</p>
             </div>
           </div>
 
           <button
-            onClick={() => onNavigate('jobs')}
+            onClick={() => onNavigate('learning')}
             className="text-xs font-bold text-[#A78BFA] hover:text-white flex items-center gap-1 transition-colors cursor-pointer self-start sm:self-auto"
           >
-            <span>Browse All Openings ({jobs.length})</span>
+            <span>Open Learning Hub</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {jobs.slice(0, 3).map((job) => {
-            const match = calculateOpportunityMatch(job.requiredSkills, skills);
-            return (
-              <div 
-                key={job.id} 
-                className="p-4 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-sm"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="min-w-0">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">
-                        {job.company}
-                      </span>
-                      <h3 className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors line-clamp-1">
-                        {job.title}
-                      </h3>
-                    </div>
-                    <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">
-                      {match.matchPercentage}% Match
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-[11px] text-slate-400 mb-3">
-                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3 text-slate-400" /> {job.location}</span>
-                    <span>•</span>
-                    <span className="text-indigo-300 font-semibold">{job.workMode}</span>
-                  </div>
-
-                  <div className="p-2 rounded-lg bg-[#090D25] border border-white/5 mb-3">
-                    <span className="text-[10px] text-slate-400 block">Package / Stipend:</span>
-                    <span className="text-xs font-black text-emerald-400">{job.stipendOrSalary}</span>
-                  </div>
-
-                  {/* Required Skill Match Indicators */}
-                  <div className="mb-4">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                      Skill Alignment:
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {job.requiredSkills.map((sk, sIdx) => {
-                        const isMatched = match.matchedSkills.includes(sk);
-                        return (
-                          <span 
-                            key={sIdx} 
-                            className={`text-[10px] px-2 py-0.5 rounded font-medium flex items-center gap-1 ${
-                              isMatched 
-                                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' 
-                                : 'bg-white/5 text-slate-400 border border-white/10'
-                            }`}
-                          >
-                            {isMatched ? '✓' : '○'} {sk}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 pt-2 border-t border-[#18214D]">
-                  <button
-                    onClick={() => onNavigate('jobs')}
-                    className="flex-1 py-1.5 rounded-lg bg-[#141C48] hover:bg-[#1D296C] text-slate-200 text-xs font-semibold transition-colors cursor-pointer text-center"
-                  >
-                    View Details
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (onApplyJob) {
-                        onApplyJob(job);
-                      } else {
-                        onNavigate('jobs');
-                      }
-                    }}
-                    className="flex-1 py-1.5 rounded-lg bg-[#7C5CFC] hover:bg-[#6D4AE8] text-white text-xs font-bold shadow transition-all cursor-pointer text-center"
-                  >
-                    Apply Now
-                  </button>
-                </div>
+          <div 
+            onClick={() => onNavigate('learning')}
+            className="p-4 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-sm cursor-pointer"
+          >
+            <div>
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Cloud Infrastructure</span>
+                <span className="text-[10px] font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                  Sprint 3 of 5
+                </span>
               </div>
-            );
-          })}
+              <h3 className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors mb-1.5">
+                AWS Cloud Architecture & Terraform
+              </h3>
+              <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">
+                Deploy VPC, ECS Fargate containers, Application Load Balancers, and automated CI/CD pipelines.
+              </p>
+            </div>
+            <div className="pt-3 mt-3 border-t border-[#18214D] flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-mono text-[11px]">8 Modules • 14 Hours</span>
+              <span className="text-[#A78BFA] font-bold group-hover:underline">Resume Course →</span>
+            </div>
+          </div>
+
+          <div 
+            onClick={() => onNavigate('learning')}
+            className="p-4 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-sm cursor-pointer"
+          >
+            <div>
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">System Design</span>
+                <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  Ready to Start
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors mb-1.5">
+                Distributed Systems & Microservices
+              </h3>
+              <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">
+                Master Kafka message brokers, database partitioning, Redis caching layers, and high-concurrency architectures.
+              </p>
+            </div>
+            <div className="pt-3 mt-3 border-t border-[#18214D] flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-mono text-[11px]">10 Modules • 18 Hours</span>
+              <span className="text-[#A78BFA] font-bold group-hover:underline">Start Track →</span>
+            </div>
+          </div>
+
+          <div 
+            onClick={() => onNavigate('assessment')}
+            className="p-4 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-sm cursor-pointer"
+          >
+            <div>
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Skill Assessment</span>
+                <span className="text-[10px] font-black text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
+                  Benchmark Test
+                </span>
+              </div>
+              <h3 className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors mb-1.5">
+                Algorithms, Data Structures & Concurrency
+              </h3>
+              <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">
+                Validate your computational complexity and algorithm design against real-time industry benchmark tests.
+              </p>
+            </div>
+            <div className="pt-3 mt-3 border-t border-[#18214D] flex items-center justify-between text-xs">
+              <span className="text-slate-400 font-mono text-[11px]">30 Questions • 45 Mins</span>
+              <span className="text-cyan-400 font-bold group-hover:underline">Take Assessment →</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 4. URGENT ACTION RECOMMENDATIONS */}
+      {/* 4. AI RECOMMENDED ACTIONS */}
       <div className="p-4 rounded-xl bg-[#0E1538] border border-[#1E2964]">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -432,145 +395,47 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div 
-            onClick={() => onNavigate('gigs')}
+            onClick={() => onNavigate('learning')}
             className="p-3 rounded-lg bg-[#141C48] border border-[#232F6E] hover:border-[#7C5CFC] cursor-pointer transition-all flex items-start gap-3 group"
           >
             <div className="p-2 rounded-lg bg-amber-500/20 text-amber-300 mt-0.5">
-              <Briefcase className="w-4 h-4" />
+              <BookOpen className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors">Complete Backend Micro-Gig</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">+15 points to experience score on approval.</p>
+              <p className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors">Start Cloud Learning Module</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">+15 points to readiness score on completion.</p>
             </div>
           </div>
 
           <div 
-            onClick={() => onNavigate('mentors')}
+            onClick={() => onNavigate('skill-gap')}
             className="p-3 rounded-lg bg-[#141C48] border border-[#232F6E] hover:border-[#7C5CFC] cursor-pointer transition-all flex items-start gap-3 group"
           >
             <div className="p-2 rounded-lg bg-pink-500/20 text-pink-300 mt-0.5">
-              <Users className="w-4 h-4" />
+              <Target className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors">Schedule System Design Capsule</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">15-min review with TCS Lead Architect.</p>
+              <p className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors">Analyze Skill Gaps & Radar</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Benchmarked against Tier-1 SDE hiring rubrics.</p>
             </div>
           </div>
 
           <div 
-            onClick={() => onNavigate('projects')}
+            onClick={() => onNavigate('resume')}
             className="p-3 rounded-lg bg-[#141C48] border border-[#232F6E] hover:border-[#7C5CFC] cursor-pointer transition-all flex items-start gap-3 group"
           >
             <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-300 mt-0.5">
-              <Code className="w-4 h-4" />
+              <FileText className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors">Start Live Industry Challenge</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">Solve verified project statement with auto-scoring.</p>
+              <p className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors">Optimize Resume & Portfolio</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Sync verified telemetry to your ATS-ready resume.</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 5. TWO-COLUMN SPLIT: ACTIVE GIGS & MENTOR MATCHES */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Active Micro-Internship Gigs */}
-        <div className="p-5 rounded-2xl bg-[#0B1033] border border-[#1C265E] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-amber-400" />
-                <h2 className="text-sm font-bold text-white">Featured Micro-Internships</h2>
-              </div>
-              <button
-                onClick={() => onNavigate('gigs')}
-                className="text-xs font-bold text-[#A78BFA] hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <span>View All ({gigs.length})</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {gigs.slice(0, 3).map((gig) => (
-                <div
-                  key={gig.id}
-                  className="p-3.5 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex items-center justify-between gap-4"
-                >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-bold text-slate-400">{gig.company}</span>
-                      <span className="text-[9px] bg-indigo-500/20 text-[#C4B5FD] px-1.5 py-0.5 rounded font-bold">{gig.skill}</span>
-                    </div>
-                    <p className="text-xs font-bold text-white truncate">{gig.title}</p>
-                    <p className="text-[11px] text-emerald-400 font-extrabold mt-1">₹{gig.payment} · {gig.hours} Hours</p>
-                  </div>
-
-                  <button
-                    onClick={() => onApplyGig(gig)}
-                    className="px-3 py-1.5 rounded-lg bg-[#7C5CFC] hover:bg-[#6D4AE8] text-white text-[11px] font-bold shrink-0 shadow transition-all cursor-pointer"
-                  >
-                    Apply
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Top Mentors */}
-        <div className="p-5 rounded-2xl bg-[#0B1033] border border-[#1C265E] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-pink-400" />
-                <h2 className="text-sm font-bold text-white">AI Mentor Matches</h2>
-              </div>
-              <button
-                onClick={() => onNavigate('mentors')}
-                className="text-xs font-bold text-[#A78BFA] hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <span>Browse Mentors ({mentors.length})</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {mentors.slice(0, 3).map((m) => (
-                <div
-                  key={m.id}
-                  className="p-3.5 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex items-center justify-between gap-4"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#7C5CFC] to-[#EC4899] flex items-center justify-center font-bold text-white text-xs shrink-0 shadow">
-                      {m.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs font-bold text-white truncate">{m.name}</p>
-                        <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
-                          {m.match}% Match
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 truncate">{m.role} · <strong>{m.company}</strong></p>
-                      <p className="text-[10px] text-slate-400">{m.experience} years experience</p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => onBookMentor(m)}
-                    className="px-3 py-1.5 rounded-lg bg-[#141D4E] hover:bg-[#1D296C] border border-[#243378] text-white text-[11px] font-bold shrink-0 transition-all cursor-pointer"
-                  >
-                    Capsule
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 6. RECENT EXPERIENCE PASSPORT VERIFICATIONS */}
+      {/* 5. RECENT EXPERIENCE PASSPORT VERIFICATIONS */}
       <div className="p-5 rounded-2xl bg-[#0B1033] border border-[#1C265E]">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 {
   "name": "Ladder",
-  "description": "Academia-Industry Portal connecting students with industry mentors, blockchain-verified skill passports, vetted micro-internships, and placement opportunities.",
+  "description": "Academia-Industry Portal empowering students with skill intelligence, diagnostic assessments, curated learning tracks, and blockchain-verified skill passports.",
   "requestFramePermissions": [
     "geolocation"
   ],

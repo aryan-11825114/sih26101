@@ -28,7 +28,8 @@ import {
   TrendingUp,
   Flame,
   Code,
-  CornerDownLeft
+  CornerDownLeft,
+  HelpCircle
 } from 'lucide-react';
 import { UserRole, StudentProfile, Mentor, Gig, PassportRecord } from '../types';
 import { mockCandidates, mockJobs, mockApplications, mockInterviews, mockDrives, mockCollabs, mockInternships } from '../data/recruiterMockData';
@@ -127,12 +128,13 @@ export const GlobalOmniSearch: React.FC<GlobalOmniSearchProps> = ({
     switch (currentRole) {
       case 'student':
         return [
-          { text: 'React.js', category: 'Skills', tab: 'skills' },
-          { text: 'Node.js Express Task', category: 'Gigs', tab: 'gigs' },
-          { text: 'Amit Verma (TCS)', category: 'Mentors', tab: 'mentors' },
-          { text: 'PostgreSQL Optimization', category: 'Passport', tab: 'passport' },
-          { text: 'Digital Twin Simulator', category: 'Pages', tab: 'twin' },
-          { text: 'Skill Quests', category: 'Quests', tab: 'quests' }
+          { text: 'Skill Intelligence Matrix', category: 'Skills', tab: 'skills' },
+          { text: 'Diagnostic Assessment', category: 'Assessment', tab: 'assessment' },
+          { text: 'Skill Gap Analysis', category: 'Analysis', tab: 'skill-gap' },
+          { text: 'Learning Hub Tracks', category: 'Learning', tab: 'learning' },
+          { text: 'Experience Passport', category: 'Passport', tab: 'passport' },
+          { text: 'AI Career Advisor', category: 'AI Advisor', tab: 'advisor' },
+          { text: 'Resume & Portfolio', category: 'Credentials', tab: 'resume' }
         ];
       case 'company':
         return [
@@ -173,72 +175,18 @@ export const GlobalOmniSearch: React.FC<GlobalOmniSearchProps> = ({
     if (currentRole === 'student') {
       // Pages / Sections
       items.push(
-        { id: 'p-dash', title: 'Student Dashboard', subtitle: 'Overview, career readiness score & DNA radar', category: 'Pages', icon: Layers, targetTab: 'dashboard', actionLabel: 'Open Dashboard' },
+        { id: 'p-dash', title: 'Student Career Dashboard', subtitle: 'Overview, career readiness score & DNA radar', category: 'Pages', icon: Layers, targetTab: 'dashboard', actionLabel: 'Open Dashboard' },
         { id: 'p-skills', title: 'Skill Intelligence Engine', subtitle: 'Skill diagnostic, benchmark scores & market demand', category: 'Pages', icon: Zap, targetTab: 'skills', actionLabel: 'View Skills' },
-        { id: 'p-gigs', title: 'Micro-Gigs & Internships Hub', subtitle: 'Paid student tasks, company deliverables & stipends', category: 'Pages', icon: Briefcase, targetTab: 'gigs', actionLabel: 'Explore Gigs' },
-        { id: 'p-mentors', title: 'Industry Mentors & Capsules', subtitle: '1-on-1 15-min mentor sessions with FAANG/Tier-1 leaders', category: 'Pages', icon: Users, targetTab: 'mentors', actionLabel: 'Book Mentor' },
+        { id: 'p-assessment', title: 'Diagnostic Skill Assessment', subtitle: 'Interactive multi-discipline skill assessments & coding tests', category: 'Pages', icon: Award, targetTab: 'assessment', actionLabel: 'Take Assessment' },
+        { id: 'p-gap', title: 'Skill Gap Analysis Matrix', subtitle: 'Compare skill profile with industry targets & benchmark gaps', category: 'Pages', icon: Target, targetTab: 'skill-gap', actionLabel: 'Analyze Gaps' },
+        { id: 'p-learning', title: 'Learning Hub & Curated Tracks', subtitle: 'Self-paced video modules, roadmaps & study paths', category: 'Pages', icon: BookOpen, targetTab: 'learning', actionLabel: 'Open Learning Hub' },
+        { id: 'p-resume', title: 'Resume & Portfolio Builder', subtitle: 'ATS-optimized resume generator and live portfolio project showcase', category: 'Pages', icon: FileText, targetTab: 'resume', actionLabel: 'Open Resume' },
+        { id: 'p-certs', title: 'Certifications & Badges', subtitle: 'Verified course certificates and earned skill badges', category: 'Pages', icon: Award, targetTab: 'certs', actionLabel: 'View Certificates' },
         { id: 'p-passport', title: 'Cryptographic Skill Passport', subtitle: 'Verified proof-of-work, hashes & blockchain credentials', category: 'Pages', icon: ShieldCheck, targetTab: 'passport', actionLabel: 'View Passport' },
-        { id: 'p-twin', title: 'AI Digital Twin & Career Simulator', subtitle: 'Career readiness simulations and trajectory planner', category: 'Pages', icon: Sparkles, targetTab: 'twin', actionLabel: 'Simulate Career' },
-        { id: 'p-quests', title: 'Skill Quests & Challenges', subtitle: 'Hands-on coding challenges & portfolio quests', category: 'Pages', icon: Target, targetTab: 'quests', actionLabel: 'Start Quests' },
-        { id: 'p-learning', title: 'Learning Hub & Curated Tracks', subtitle: 'Self-paced video modules & project roadmaps', category: 'Pages', icon: BookOpen, targetTab: 'learning-hub', actionLabel: 'Open Hub' },
-        { id: 'p-interview', title: 'AI Mock Interview Prep', subtitle: 'Real-time technical interview simulator & behavioral feedback', category: 'Pages', icon: Video, targetTab: 'interview-prep', actionLabel: 'Practice Interview' },
-        { id: 'p-time-machine', title: 'Career Time Machine', subtitle: 'Predictive timeline for 2026–2027 placement milestones', category: 'Pages', icon: Clock, targetTab: 'time-machine', actionLabel: 'View Predictions' },
+        { id: 'p-advisor', title: 'AI Career Advisor', subtitle: 'Personalized AI career guidance, strategy & milestones', category: 'Pages', icon: Sparkles, targetTab: 'advisor', actionLabel: 'Consult Advisor' },
+        { id: 'p-helpdesk', title: 'AI Help Desk (Bridge Buddy)', subtitle: 'Interactive 24/7 student support, queries & career assistant', category: 'Pages', icon: HelpCircle, targetTab: 'helpdesk', actionLabel: 'Open Help Desk' },
         { id: 'p-trust', title: 'Trust & Verification Ledger', subtitle: 'Institutional verification and accreditation status', category: 'Pages', icon: ShieldCheck, targetTab: 'trust', actionLabel: 'Check Trust' }
       );
-
-      // Micro-Gigs
-      const gigsList = gigs.length > 0 ? gigs : [
-        { id: 101, title: 'Express API JWT Auth & Rate Limiting', company: 'CloudSphere Systems', skill: 'Node.js & Express', hours: 4, payment: 2500, status: 'open' as const, description: 'Implement production-ready JWT authentication middleware with redis rate limiting.' },
-        { id: 102, title: 'PostgreSQL Query Optimization & Indexing', company: 'DataMatrix Labs', skill: 'PostgreSQL & SQL', hours: 6, payment: 3500, status: 'open' as const, description: 'Analyze slow query logs, build B-Tree compound indexes and optimize joins.' },
-        { id: 103, title: 'React 18 Dashboard UI & Recharts', company: 'PixelWorks Studio', skill: 'React.js & TypeScript', hours: 5, payment: 3000, status: 'open' as const, description: 'Build a responsive real-time analytics dashboard with Tailwind and Recharts.' },
-        { id: 104, title: 'FastAPI Microservice for PDF Extraction', company: 'DocuMind AI', skill: 'Python & FastAPI', hours: 8, payment: 4500, status: 'open' as const, description: 'Develop an asynchronous document ingestion pipeline using FastAPI and PyMuPDF.' }
-      ];
-
-      gigsList.forEach(g => {
-        items.push({
-          id: `gig-${g.id}`,
-          title: g.title,
-          subtitle: `${g.company} • ${g.skill} • ${g.hours} hrs • ₹${g.payment.toLocaleString()}`,
-          category: 'Gigs',
-          icon: Briefcase,
-          tag: `₹${g.payment.toLocaleString()}`,
-          tagColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
-          badge: g.skill,
-          targetTab: 'gigs',
-          actionLabel: 'Apply Micro-Gig',
-          onSelect: () => {
-            if (onSelectGig) onSelectGig(g);
-          },
-          metadata: g
-        });
-      });
-
-      // Mentors
-      const mentorsList = mentors.length > 0 ? mentors : [
-        { id: 1, name: 'Amit Verma', role: 'Staff Backend Architect', company: 'Tata Consultancy Services', experience: 9, match: 96, availability: true, specialization: 'Distributed Systems & Cloud Ops', bio: 'Helps students master backend architectures, Docker containerization, and AWS microservices.' },
-        { id: 2, name: 'Priya Sharma', role: 'Lead Data Scientist', company: 'Fractal Analytics', experience: 7, match: 91, availability: true, specialization: 'Machine Learning & Python', bio: 'Specializes in computer vision pipelines, scikit-learn model tuning, and data storytelling.' },
-        { id: 3, name: 'Rohan Joshi', role: 'Senior Frontend Engineer', company: 'Swiggy', experience: 6, match: 88, availability: true, specialization: 'React 18 & Web Performance', bio: 'Mentors on frontend state management, WebSockets, and modern UI engineering.' },
-        { id: 4, name: 'Dr. Meera Iyer', role: 'Principal Security Researcher', company: 'Cisco Systems', experience: 12, match: 94, availability: true, specialization: 'Cybersecurity & Zero Trust', bio: 'Guiding undergraduates on threat modeling, cryptosystems, and defensive network architectures.' }
-      ];
-
-      mentorsList.forEach(m => {
-        items.push({
-          id: `mentor-${m.id}`,
-          title: `${m.name} (${m.company})`,
-          subtitle: `${m.role} • ${m.specialization || 'Technical Mentor'} • ${m.experience} yrs exp`,
-          category: 'Mentors',
-          icon: Users,
-          tag: `${m.match}% Match`,
-          tagColor: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
-          badge: m.company,
-          targetTab: 'mentors',
-          actionLabel: 'Book 15-Min Capsule',
-          onSelect: () => {
-            if (onSelectMentor) onSelectMentor(m);
-          },
-          metadata: m
-        });
-      });
 
       // Skills & DNA Inventory
       INITIAL_SKILLS.forEach(s => {

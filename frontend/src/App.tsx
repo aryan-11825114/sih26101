@@ -5,8 +5,6 @@ import { ProfileDrawer } from './components/ProfileDrawer';
 import { NotificationModal, NotificationItem } from './components/NotificationModal';
 import { AuthPortal, AuthSuccessPayload } from './components/AuthPortal';
 import { DashboardSplash } from './components/DashboardSplash';
-import { ApplyGigModal } from './components/ApplyGigModal';
-import { BookMentorModal } from './components/BookMentorModal';
 import { Toast } from './components/Toast';
 import { BridgeBuddy } from './components/BridgeBuddy';
 
@@ -15,15 +13,10 @@ import { SkillIntelligenceView } from './pages/SkillIntelligenceView';
 import { SkillAssessmentView } from './pages/SkillAssessmentView';
 import { SkillGapAnalysisView } from './pages/SkillGapAnalysisView';
 import { LearningHubView } from './pages/LearningHubView';
-import { JobsPlacementsView } from './pages/JobsPlacementsView';
-import { ApplicationsTrackerView } from './pages/ApplicationsTrackerView';
-import { ProjectsChallengesView } from './pages/ProjectsChallengesView';
 import { CertificationsAchievementsView } from './pages/CertificationsAchievementsView';
 import { ResumePortfolioView } from './pages/ResumePortfolioView';
 import { AICareerAdvisorView } from './pages/AICareerAdvisorView';
 
-import { MicroGigsView } from './pages/MicroGigsView';
-import { MentorCapsulesView } from './pages/MentorCapsulesView';
 import { ExperiencePassportView } from './pages/ExperiencePassportView';
 import { TrustVerificationView } from './pages/TrustVerificationView';
 import { AIHelpdeskView } from './pages/AIHelpdeskView';
@@ -121,9 +114,6 @@ export const App: React.FC = () => {
     role: 'student',
     college: null
   });
-
-  const [applyingGig, setApplyingGig] = useState<Gig | null>(null);
-  const [bookingMentor, setBookingMentor] = useState<Mentor | null>(null);
 
   // Mobile & Sidebar state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -400,14 +390,6 @@ export const App: React.FC = () => {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onNavigateTab={(tab) => setActiveTab(tab)}
-          onSelectGig={(gig) => {
-            setActiveTab('gigs');
-            setApplyingGig(gig);
-          }}
-          onSelectMentor={(mentor) => {
-            setActiveTab('mentors');
-            setBookingMentor(mentor);
-          }}
           onShowToast={showToast}
           gigs={gigs}
           mentors={mentors}
@@ -480,14 +462,11 @@ export const App: React.FC = () => {
                     passport={passport}
                     onNavigate={(tab) => setActiveTab(tab)}
                     onOpenProfile={() => setIsProfileOpen(true)}
-                    onBookMentor={(m) => setBookingMentor(m)}
-                    onApplyGig={(g) => setApplyingGig(g)}
                   />
                 )}
 
                 {activeTab === 'skills' && (
                   <SkillIntelligenceView 
-                    onNavigateToGigs={() => setActiveTab('gigs')}
                     onNavigateTab={(t) => setActiveTab(t)}
                   />
                 )}
@@ -506,10 +485,6 @@ export const App: React.FC = () => {
                   <SkillGapAnalysisView
                     student={student}
                     onNavigateTab={(t) => setActiveTab(t)}
-                    onBookMentor={(topic) => {
-                      showToast(`Opened mentor booking for "${topic}"`, 'info');
-                      setActiveTab('mentors');
-                    }}
                   />
                 )}
 
@@ -520,29 +495,6 @@ export const App: React.FC = () => {
                     onSkillUpdated={() => {
                       showToast('Course module completed! Skill readiness boosted.', 'success');
                     }}
-                  />
-                )}
-
-                {activeTab === 'jobs' && (
-                  <JobsPlacementsView
-                    student={student}
-                    onNavigateTab={(t) => setActiveTab(t)}
-                    onApplicationCreated={() => {
-                      showToast('Application registered in tracker ledger!', 'success');
-                    }}
-                  />
-                )}
-
-                {(activeTab === 'tracker' || activeTab === 'applications') && (
-                  <ApplicationsTrackerView
-                    onNavigateTab={(t) => setActiveTab(t)}
-                  />
-                )}
-
-                {activeTab === 'projects' && (
-                  <ProjectsChallengesView
-                    student={student}
-                    onNavigateTab={(t) => setActiveTab(t)}
                   />
                 )}
 
@@ -564,21 +516,6 @@ export const App: React.FC = () => {
                   <AICareerAdvisorView
                     student={student}
                     onNavigateTab={(t) => setActiveTab(t)}
-                  />
-                )}
-
-                {activeTab === 'gigs' && (
-                  <MicroGigsView
-                    gigs={gigs}
-                    onApplyGig={(g) => setApplyingGig(g)}
-                    onCreateGig={handleCreateGig}
-                  />
-                )}
-
-                {activeTab === 'mentors' && (
-                  <MentorCapsulesView
-                    mentors={mentors}
-                    onBookMentor={(m) => setBookingMentor(m)}
                   />
                 )}
 
@@ -619,8 +556,6 @@ export const App: React.FC = () => {
         notifications={notifications}
         onMarkAllAsRead={handleMarkAllNotificationsRead}
         onActionClick={(item) => {
-          if (item.type === 'gig') setActiveTab('gigs');
-          if (item.type === 'mentor') setActiveTab('mentors');
           if (item.type === 'passport') setActiveTab('passport');
           setIsNotificationsOpen(false);
         }}
@@ -633,24 +568,6 @@ export const App: React.FC = () => {
         initialMode={authInitialMode}
         initialRole={authInitialRole}
         onAuthSuccess={handleAuthPortalSuccess}
-      />
-
-      {/* Gig Application Modal */}
-      <ApplyGigModal
-        gig={applyingGig}
-        isOpen={!!applyingGig}
-        onClose={() => setApplyingGig(null)}
-        onSuccess={handleApplyGigSuccess}
-        studentId={student.id}
-      />
-
-      {/* Mentor Booking Modal */}
-      <BookMentorModal
-        mentor={bookingMentor}
-        isOpen={!!bookingMentor}
-        onClose={() => setBookingMentor(null)}
-        onSuccess={handleBookMentorSuccess}
-        studentId={student.id}
       />
 
       {/* Global Toast */}
