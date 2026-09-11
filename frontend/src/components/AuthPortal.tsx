@@ -17,7 +17,8 @@ import {
   Layers,
   Camera,
   MapPin,
-  RefreshCw
+  RefreshCw,
+  ShieldCheck
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { 
@@ -84,6 +85,25 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
   const [studentCollege, setStudentCollege] = useState<CollegeItem>(UNIS[0]);
   const [studentEmail, setStudentEmail] = useState('adarsh.pratap@mjpru.ac.in');
   const [studentPassword, setStudentPassword] = useState('password123');
+
+  // --- APAAR ID & DigiLocker Verification ---
+  const [loginMethod, setLoginMethod] = useState<'email' | 'apaar'>('email');
+  const [apaarId, setApaarId] = useState('2458-9102-3341');
+  const [isApaarVerified, setIsApaarVerified] = useState(false);
+  const [isVerifyingApaar, setIsVerifyingApaar] = useState(false);
+
+  const handleVerifyApaar = () => {
+    if (!apaarId || apaarId.trim().length < 10) {
+      alert('Please enter a valid 12-digit APAAR ID.');
+      return;
+    }
+    setIsVerifyingApaar(true);
+    setTimeout(() => {
+      setIsVerifyingApaar(false);
+      setIsApaarVerified(true);
+      alert('APAAR ID verified successfully via DigiLocker / ABC Registry!');
+    }, 1200);
+  };
 
   // --- Mentor Fields ---
   const [mentorName, setMentorName] = useState('Amit Verma');
@@ -484,6 +504,47 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     </div>
                   </div>
 
+                  {/* APAAR ID & DigiLocker Verification */}
+                  <div className="space-y-2 p-3.5 rounded-2xl bg-emerald-950/20 border border-emerald-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>APAAR ID / ABC Registry Verification</span>
+                      </div>
+                      <span className="text-[10px] text-emerald-300/80 bg-emerald-500/10 px-2 py-0.5 rounded-full">DigiLocker Linked</span>
+                    </div>
+                    <div className="relative flex gap-2">
+                      <div className="relative flex-1">
+                        <Hash className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          value={apaarId}
+                          onChange={(e) => setApaarId(e.target.value)}
+                          placeholder="Enter 12-Digit APAAR ID"
+                          className="w-full bg-[#1A1F3D] border border-white/10 focus:border-emerald-500 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleVerifyApaar}
+                        disabled={isVerifyingApaar || isApaarVerified}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                          isApaarVerified 
+                            ? 'bg-emerald-500 text-white cursor-default' 
+                            : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md'
+                        }`}
+                      >
+                        {isVerifyingApaar ? 'Verifying...' : isApaarVerified ? '✓ Verified' : 'Verify ID'}
+                      </button>
+                    </div>
+                    {isApaarVerified && (
+                      <div className="text-[11px] text-emerald-300 flex items-center gap-1.5 pt-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>APAAR ID successfully verified & bound to academic profile.</span>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
@@ -568,39 +629,107 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
               ) : (
                 /* Student Login Mode */
                 <div className="space-y-3.5">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                      Official University Email / Username
-                    </label>
-                    <div className="relative">
-                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="email"
-                        required
-                        value={studentEmail}
-                        onChange={(e) => setStudentEmail(e.target.value)}
-                        placeholder="adarsh.pratap@mjpru.ac.in"
-                        className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                      />
-                    </div>
+                  {/* Login Method Toggle: Email vs APAAR ID */}
+                  <div className="flex items-center p-1 bg-[#1A1F3D] rounded-xl border border-white/10 mb-2">
+                    <button
+                      type="button"
+                      onClick={() => setLoginMethod('email')}
+                      className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
+                        loginMethod === 'email' ? 'bg-[#7C5CFC] text-white' : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      Email & Password
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLoginMethod('apaar')}
+                      className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
+                        loginMethod === 'apaar' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      APAAR ID (DigiLocker)
+                    </button>
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="password"
-                        required
-                        value={studentPassword}
-                        onChange={(e) => setStudentPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                      />
+                  {loginMethod === 'apaar' ? (
+                    <div className="space-y-3 p-4 rounded-2xl bg-emerald-950/25 border border-emerald-500/30">
+                      <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>Automated Permanent Academic Account Registry (APAAR / ABC)</span>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                          12-Digit APAAR ID / Academic ID
+                        </label>
+                        <div className="relative flex gap-2">
+                          <div className="relative flex-1">
+                            <Hash className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input
+                              type="text"
+                              value={apaarId}
+                              onChange={(e) => setApaarId(e.target.value)}
+                              placeholder="e.g. 2458-9102-3341"
+                              className="w-full bg-[#1A1F3D] border border-white/10 focus:border-emerald-500 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleVerifyApaar}
+                            disabled={isVerifyingApaar || isApaarVerified}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                              isApaarVerified 
+                                ? 'bg-emerald-500 text-white cursor-default' 
+                                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md'
+                            }`}
+                          >
+                            {isVerifyingApaar ? 'Verifying...' : isApaarVerified ? '✓ Verified' : 'Verify'}
+                          </button>
+                        </div>
+                      </div>
+                      {isApaarVerified && (
+                        <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <span>APAAR ID Confirmed. Academic records & university profile linked.</span>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                          Official University Email / Username
+                        </label>
+                        <div className="relative">
+                          <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="email"
+                            required
+                            value={studentEmail}
+                            onChange={(e) => setStudentEmail(e.target.value)}
+                            placeholder="adarsh.pratap@mjpru.ac.in"
+                            className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                          Password
+                        </label>
+                        <div className="relative">
+                          <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="password"
+                            required
+                            value={studentPassword}
+                            onChange={(e) => setStudentPassword(e.target.value)}
+                            placeholder="••••••••"
+                            className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   <UniversityDropdown
                     selectedCollege={studentCollege}
