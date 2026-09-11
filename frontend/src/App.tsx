@@ -12,6 +12,7 @@ import { StudentDashboard } from './pages/StudentDashboard';
 import { SkillIntelligenceView } from './pages/SkillIntelligenceView';
 import { SkillAssessmentView } from './pages/SkillAssessmentView';
 import { SkillGapAnalysisView } from './pages/SkillGapAnalysisView';
+import { QuizMcqsView } from './pages/QuizMcqsView';
 import { LearningHubView } from './pages/LearningHubView';
 import { CertificationsAchievementsView } from './pages/CertificationsAchievementsView';
 import { ResumePortfolioView } from './pages/ResumePortfolioView';
@@ -477,6 +478,13 @@ export const App: React.FC = () => {
                     onScoreUpdated={() => {
                       showToast('Skill DNA & Readiness updated from assessment results!', 'success');
                     }}
+                  />
+                )}
+
+                {activeTab === 'quiz-mcqs' && (
+                  <QuizMcqsView
+                    student={student}
+                    onShowToast={showToast}
                   />
                 )}
 

@@ -25,7 +25,8 @@ import {
   Menu,
   Lock,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  CheckCircle
 } from 'lucide-react';
 import { UserRole, StudentProfile } from '../types';
 import { Logo } from './Logo';
@@ -201,6 +202,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Award className="w-4 h-4 text-cyan-300 shrink-0" />
                     {!collapsed && <span className="truncate">Skill Assessment</span>}
+                  </button>
+
+                  <button
+                    id="nav-quiz-mcqs"
+                    onClick={() => handleTabClick('quiz-mcqs')}
+                    title="Quiz & MCQs"
+                    className={`w-full flex items-center ${collapsed ? 'justify-center w-10 h-10 mx-auto px-0 py-0 gap-0' : 'gap-3 px-2.5 py-2'} rounded-xl text-[13px] font-semibold transition-all ${
+                      activeTab === 'quiz-mcqs'
+                        ? 'bg-[#7C5CFC]/20 text-[#C4B5FD] border border-[#7C5CFC]/30 shadow-sm font-bold'
+                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                    {!collapsed && <span className="truncate">Quiz & MCQs</span>}
                   </button>
 
                   <button
