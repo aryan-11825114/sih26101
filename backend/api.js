@@ -541,6 +541,33 @@ function registerApiRoutes(app) {
     }
   });
 
+  /* ================= SKILL INTELLIGENCE (iGOT Integration) ================= */
+  app.get("/api/ai/igot/recommendations", (req, res) => {
+    res.json({
+        recommendations: [
+            { id: 1, title: "AI in Statistical Systems", provider: "iGOT Karmayogi", status: "Not Started" },
+            { id: 2, title: "Big Data Analytics for Policy", provider: "iGOT Karmayogi", status: "In Progress" },
+            { id: 3, title: "Digital Public Infrastructure", provider: "iGOT Karmayogi", status: "Not Started" }
+        ]
+    });
+  });
+
+  app.post("/api/ai/quiz/generate", async (req, res) => {
+    const { content } = req.body;
+    const ai = getGenAiClient();
+    if (!ai) return res.status(500).json({ error: "AI Client not initialized" });
+    
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-3.7-flash",
+            contents: [{ role: "user", parts: [{ text: `Generate 3 MCQs with answers from this content: ${content}` }] }]
+        });
+        res.json({ quiz: response.text });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to generate quiz" });
+    }
+  });
+
   /* ================= CAREER ANALYSIS ================= */
   app.get("/api/ai/career-analysis", (req, res) => {
     res.json({

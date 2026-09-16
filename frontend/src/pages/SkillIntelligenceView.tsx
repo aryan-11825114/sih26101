@@ -7,6 +7,7 @@ import {
   CheckCircle2, 
   ArrowRight,
   BookOpen,
+  BookOpenText,
   Code,
   Layers,
   Award,
@@ -236,6 +237,47 @@ export const SkillIntelligenceView: React.FC<SkillIntelligenceProps> = ({
           );
         })}
       </div>
+
+      {/* iGOT & Quiz Generator Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* iGOT Recommendations */}
+        <div className="p-6 rounded-2xl bg-[#0E1538] border border-[#1E2964] shadow-xl">
+          <h2 className="text-lg font-extrabold text-white mb-4 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-emerald-400" />
+            iGOT Karmayogi Recommended Courses
+          </h2>
+          <div className="space-y-3">
+             {[
+               {title: "AI in Statistical Systems", provider: "iGOT Karmayogi"},
+               {title: "Big Data Analytics for Policy", provider: "iGOT Karmayogi"},
+               {title: "Digital Public Infrastructure", provider: "iGOT Karmayogi"}
+             ].map((course, idx) => (
+                <div key={idx} className="p-3 rounded-xl bg-[#1A224D] border border-white/5 flex items-center justify-between">
+                    <div>
+                        <p className="text-xs font-bold text-white">{course.title}</p>
+                        <p className="text-[10px] text-slate-400">{course.provider}</p>
+                    </div>
+                    <button className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-500/20 hover:bg-emerald-500/30">Enroll</button>
+                </div>
+             ))}
+          </div>
+        </div>
+
+        {/* AI Quiz Generator */}
+        <div className="p-6 rounded-2xl bg-[#0E1538] border border-[#1E2964] shadow-xl">
+          <h2 className="text-lg font-extrabold text-white mb-4 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-400" />
+            AI Quiz Generator
+          </h2>
+          <p className="text-xs text-slate-400 mb-4">Upload learning materials to generate assessments instantly.</p>
+          <div className="h-24 flex items-center justify-center border-2 border-dashed border-white/10 rounded-xl bg-[#1A224D] hover:border-amber-500/50 transition-colors cursor-pointer">
+            <button className="flex items-center gap-2 text-amber-400 text-xs font-bold">
+              <BookOpenText className="w-4 h-4" /> Click to upload documents/videos
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };
