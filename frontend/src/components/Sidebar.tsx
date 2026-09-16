@@ -181,7 +181,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }`}
                   >
                     <Cpu className="w-4 h-4 text-cyan-400 shrink-0" />
-                    {!collapsed && <span className="truncate">Skill Intelligence</span>}
+                    {!collapsed && <span className="truncate">Skill Intelligence (iGOT)</span>}
                   </button>
 
                   <button

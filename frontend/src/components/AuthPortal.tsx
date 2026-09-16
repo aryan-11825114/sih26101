@@ -63,11 +63,9 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
   onAuthSuccess
 }) => {
   const [authMode, setAuthMode] = useState<'login' | 'register'>(initialMode);
-  const [roleTab, setRoleTab] = useState<'Student' | 'Mentor' | 'HOD' | 'Recruiter'>(() => {
-    if (initialRole === 'mentor') return 'Mentor';
-    if (initialRole === 'hod') return 'HOD';
-    if (initialRole === 'company') return 'Recruiter';
-    return 'Student';
+  const [roleTab, setRoleTab] = useState<'Learner' | 'Admin'>(() => {
+    if (initialRole === 'company') return 'Admin';
+    return 'Learner';
   });
 
   const [photoPreview, setPhotoPreview] = useState<string>(() => {
@@ -134,10 +132,8 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setAuthMode(initialMode);
-      if (initialRole === 'mentor') setRoleTab('Mentor');
-      else if (initialRole === 'hod') setRoleTab('HOD');
-      else if (initialRole === 'company') setRoleTab('Recruiter');
-      else setRoleTab('Student');
+      if (initialRole === 'company') setRoleTab('Admin');
+      else setRoleTab('Learner');
       
       const storedPhoto = localStorage.getItem('userPhoto') || localStorage.getItem('profilePhoto') || '';
       setPhotoPreview(storedPhoto);
@@ -206,7 +202,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
       let form: any = {};
       let targetUserRole: UserRole = 'student';
 
-      if (roleTab === 'Student') {
+      if (roleTab === 'Learner') {
         form = {
           name: studentName.trim() || 'Adarsh Pratap Singh',
           email: studentEmail.trim() || 'adarsh.pratap@mjpru.ac.in',
@@ -216,26 +212,6 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
           year: academicYear
         };
         targetUserRole = 'student';
-      } else if (roleTab === 'Mentor') {
-        const comp = customCompany.trim() || mentorCompanyPreset;
-        form = {
-          name: mentorName.trim() || 'Amit Verma',
-          email: mentorEmail.trim() || 'amit.verma@tcs.com',
-          company: comp,
-          uni: 'Industry Partner',
-          dept: 'Software Engineering',
-          year: 'N/A'
-        };
-        targetUserRole = 'mentor';
-      } else if (roleTab === 'HOD') {
-        form = {
-          name: hodName.trim() || 'Dr. Arvind K. Sharma',
-          email: hodEmail.trim() || 'hod.csit@mjpru.ac.in',
-          uni: hodCollege.name,
-          dept: hodDept,
-          year: 'N/A'
-        };
-        targetUserRole = 'hod';
       } else {
         form = {
           name: recruiterName.trim() || 'Priya Sharma',
@@ -262,25 +238,18 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
         year: form.year
       };
 
-      if (roleTab === 'Student') {
+      if (roleTab === 'Learner') {
         profile.rollNo = form.roll;
-        profile.type = 'Student Candidate';
-      } else if (roleTab === 'Mentor') {
+        profile.type = 'Learner';
+      } else if (roleTab === 'Admin') {
         profile.company = form.company;
-        profile.type = `Mentor - ${form.company}`;
-        delete profile.rollNo;
-      } else if (roleTab === 'HOD') {
-        profile.type = `HOD - ${form.dept}`;
-        delete profile.rollNo; // No roll for HOD
-      } else if (roleTab === 'Recruiter') {
-        profile.company = form.company;
-        profile.type = `Recruiter - ${form.company}`;
+        profile.type = `Admin - ${form.company}`;
         delete profile.rollNo;
       }
 
       // Persist exact records to localStorage
       localStorage.setItem('userProfile', JSON.stringify(profile));
-      localStorage.setItem('userRole', roleTab === 'Student' ? 'student' : roleTab === 'Mentor' ? 'Mentor' : roleTab === 'HOD' ? 'HOD' : 'company');
+      localStorage.setItem('userRole', roleTab === 'Learner' ? 'student' : 'company');
       localStorage.setItem('role', targetUserRole);
       localStorage.setItem('userPhoto', profile.photo);
       localStorage.setItem('profilePhoto', profile.photo);
@@ -304,7 +273,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
         role: targetUserRole,
         email: profile.email,
         department: profile.department,
-        college: roleTab === 'Student' ? studentCollege : roleTab === 'HOD' ? hodCollege : null,
+        college: roleTab === 'Learner' ? studentCollege : null,
         batch: profile.year,
         rollNo: profile.rollNo,
         company: profile.company,
@@ -365,62 +334,36 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              Register Student / User
+              Register Learner / User
             </button>
           </div>
 
-          {/* Role Tabs [Student] [Mentor] [HOD] [Recruiter] - Student Default */}
-          <div className="grid grid-cols-4 gap-1.5 p-1 bg-[#1A1F3D]/80 rounded-xl border border-white/5">
+          {/* Role Tabs [Learner] [Admin] - Learner Default */}
+          <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#1A1F3D]/80 rounded-xl border border-white/5">
             <button
               type="button"
-              onClick={() => setRoleTab('Student')}
+              onClick={() => setRoleTab('Learner')}
               className={`flex items-center justify-center gap-1.5 py-2 px-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                roleTab === 'Student'
+                roleTab === 'Learner'
                   ? 'bg-[#7C5CFC]/30 text-white border border-[#7C5CFC]'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <GraduationCap className="w-3.5 h-3.5" />
-              <span>Student</span>
+              <span>Learner</span>
             </button>
 
             <button
               type="button"
-              onClick={() => setRoleTab('Mentor')}
+              onClick={() => setRoleTab('Admin')}
               className={`flex items-center justify-center gap-1.5 py-2 px-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                roleTab === 'Mentor'
-                  ? 'bg-[#7C5CFC]/30 text-white border border-[#7C5CFC]'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Mentor</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setRoleTab('HOD')}
-              className={`flex items-center justify-center gap-1.5 py-2 px-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                roleTab === 'HOD'
-                  ? 'bg-[#7C5CFC]/30 text-white border border-[#7C5CFC]'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>HOD</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setRoleTab('Recruiter')}
-              className={`flex items-center justify-center gap-1.5 py-2 px-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                roleTab === 'Recruiter'
+                roleTab === 'Admin'
                   ? 'bg-[#7C5CFC]/30 text-white border border-[#7C5CFC]'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Briefcase className="w-3.5 h-3.5" />
-              <span>Recruiter</span>
+              <span>Admin</span>
             </button>
           </div>
         </div>
@@ -463,8 +406,8 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
             </span>
           </div>
 
-          {/* 1. STUDENT PATHWAY */}
-          {roleTab === 'Student' && (
+          {/* 1. LEARNER PATHWAY */}
+          {roleTab === 'Learner' && (
             <>
               {authMode === 'register' ? (
                 <div className="space-y-3.5">
@@ -757,28 +700,21 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
             </>
           )}
 
-          {/* 2. MENTOR PATHWAY */}
-          {roleTab === 'Mentor' && (
+          {/* 2. ADMIN PATHWAY */}
+          {roleTab === 'Admin' && (
             <div className="space-y-3.5">
-              <div className="p-3 rounded-xl bg-[#7C5CFC]/10 border border-[#7C5CFC]/20 flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-[#A78BFA] shrink-0 mt-0.5" />
-                <p className="text-xs text-slate-300">
-                  <strong className="text-white">Industry Mentor Capsule:</strong> Guide students via 1:1 15-minute high-impact capsules, review proof-of-work code, and sponsor micro-internships.
-                </p>
-              </div>
-
               <div>
                 <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Mentor Full Name
+                  Admin Full Name
                 </label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     required
-                    value={mentorName}
-                    onChange={(e) => setMentorName(e.target.value)}
-                    placeholder="e.g. Amit Verma"
+                    value={recruiterName}
+                    onChange={(e) => setRecruiterName(e.target.value)}
+                    placeholder="e.g. Priya Sharma"
                     className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
                   />
                 </div>
@@ -794,9 +730,9 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     <input
                       type="email"
                       required
-                      value={mentorEmail}
-                      onChange={(e) => setMentorEmail(e.target.value)}
-                      placeholder="amit.verma@tcs.com"
+                      value={recruiterEmail}
+                      onChange={(e) => setRecruiterEmail(e.target.value)}
+                      placeholder="priya.sharma@company.com"
                       className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
                     />
                   </div>
@@ -811,8 +747,8 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     <input
                       type="password"
                       required
-                      value={mentorPassword}
-                      onChange={(e) => setMentorPassword(e.target.value)}
+                      value={recruiterPassword}
+                      onChange={(e) => setRecruiterPassword(e.target.value)}
                       placeholder="••••••••"
                       className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
                     />
@@ -822,204 +758,16 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
 
               <div>
                 <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Enterprise Company & Experience
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <select
-                    value={mentorCompanyPreset}
-                    onChange={(e) => setMentorCompanyPreset(e.target.value)}
-                    className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer"
-                  >
-                    {MENTOR_COMPANIES_DATA.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={customCompany}
-                    onChange={(e) => setCustomCompany(e.target.value)}
-                    placeholder="Or custom (e.g. Meta - 7 Yrs)"
-                    className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Technical Expertise Domains
-                </label>
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {MENTOR_EXPERTISE_TAGS.map((tag) => {
-                    const active = selectedExpertise.includes(tag);
-                    return (
-                      <button
-                        type="button"
-                        key={tag}
-                        onClick={() => toggleExpertise(tag)}
-                        className={`text-[11px] px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
-                          active
-                            ? 'bg-[#7C5CFC]/30 border-[#7C5CFC] text-white font-medium'
-                            : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        {tag} {active && '✓'}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 3. HOD / FACULTY PATHWAY */}
-          {roleTab === 'HOD' && (
-            <div className="space-y-3.5">
-              <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-start gap-2.5">
-                <Building2 className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                <p className="text-xs text-slate-300">
-                  <strong className="text-white">Department Head (HOD) Panel:</strong> Institutional accreditation analytics, batch readiness telemetry, syllabus alignment, and placement pipeline tracking.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  HOD / Faculty Full Name
-                </label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    required
-                    value={hodName}
-                    onChange={(e) => setHodName(e.target.value)}
-                    placeholder="e.g. Dr. Arvind K. Sharma"
-                    className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                  />
-                </div>
-              </div>
-
-              <UniversityDropdown
-                selectedCollege={hodCollege}
-                onSelect={(col) => setHodCollege(col)}
-                label="University / College Affiliation"
-              />
-
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Department Leadership
-                </label>
-                <select
-                  value={hodDept}
-                  onChange={(e) => setHodDept(e.target.value)}
-                  className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl px-3 py-2 text-xs text-white outline-none cursor-pointer"
-                >
-                  {DEPARTMENTS.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                    Official Academic Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="email"
-                      required
-                      value={hodEmail}
-                      onChange={(e) => setHodEmail(e.target.value)}
-                      placeholder="hod.csit@mjpru.ac.in"
-                      className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="password"
-                      required
-                      value={hodPassword}
-                      onChange={(e) => setHodPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 4. RECRUITER PATHWAY */}
-          {roleTab === 'Recruiter' && (
-            <div className="space-y-3.5">
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Recruiter Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={recruiterName}
-                  onChange={(e) => setRecruiterName(e.target.value)}
-                  placeholder="e.g. Priya Sharma"
-                  className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Hiring Organization / Company
+                  Organization / Company Name
                 </label>
                 <input
                   type="text"
                   required
                   value={recruiterCompany}
                   onChange={(e) => setRecruiterCompany(e.target.value)}
-                  placeholder="e.g. Google Cloud India"
+                  placeholder="e.g. Tech Corp"
                   className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
                 />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                    Corporate Email
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={recruiterEmail}
-                    onChange={(e) => setRecruiterEmail(e.target.value)}
-                    placeholder="priya.sharma@google.com"
-                    className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={recruiterPassword}
-                    onChange={(e) => setRecruiterPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 outline-none"
-                  />
-                </div>
               </div>
             </div>
           )}
@@ -1040,20 +788,12 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                 <>
                   <span>
                     {authMode === 'register'
-                      ? roleTab === 'Student'
+                      ? roleTab === 'Learner'
                         ? 'Register & Sync Profile ->'
-                        : roleTab === 'Mentor'
-                        ? 'Register as Mentor'
-                        : roleTab === 'HOD'
-                        ? 'Register as HOD'
-                        : 'Register as Recruiter'
-                      : roleTab === 'Student'
-                      ? 'Sign In to Student OS'
-                      : roleTab === 'Mentor'
-                      ? 'Sign In to Mentor Capsule'
-                      : roleTab === 'HOD'
-                      ? 'Sign In to HOD Panel'
-                      : 'Sign In to Recruiter Portal'}
+                        : 'Register as Admin'
+                      : roleTab === 'Learner'
+                      ? 'Sign In to Learner OS'
+                      : 'Sign In to Admin Portal'}
                   </span>
                   <ArrowRight className="w-4 h-4" />
                 </>
