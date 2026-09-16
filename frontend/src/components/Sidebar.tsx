@@ -264,19 +264,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {!collapsed && <span className="truncate">Resume & Portfolio</span>}
                   </button>
 
-                  <button
-                    id="nav-certs"
-                    onClick={() => handleTabClick('certs')}
-                    title="Certifications"
-                    className={`w-full flex items-center ${collapsed ? 'justify-center w-10 h-10 mx-auto px-0 py-0 gap-0' : 'gap-3 px-2.5 py-2'} rounded-xl text-[13px] font-semibold transition-all ${
-                      activeTab === 'certs'
-                        ? 'bg-[#7C5CFC]/20 text-[#C4B5FD] border border-[#7C5CFC]/30 shadow-sm font-bold'
-                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <Award className="w-4 h-4 text-amber-400 shrink-0" />
-                    {!collapsed && <span className="truncate">Certifications & Badges</span>}
-                  </button>
 
                   <button
                     id="nav-advisor"

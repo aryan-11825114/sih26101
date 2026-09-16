@@ -516,6 +516,8 @@ export const App: React.FC = () => {
                   <ResumePortfolioView
                     student={student}
                     onOpenProfile={() => setIsProfileOpen(true)}
+                    onNavigateTab={(tab) => setActiveTab(tab)}
+                    onShowToast={showToast}
                   />
                 )}
 
