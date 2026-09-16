@@ -857,7 +857,7 @@ app.post("/api/ai/helpdesk/chat", async (req, res) => {
   const ai = getGenAiClient();
   if (ai) {
     try {
-      const systemInstruction = `You are Bridge Buddy. Rules: 1) Answer in max 70 words 2) Direct code only 3) No intro 4) maxOutputTokens 350, temperature 0.2, topP 0.7, topK 15 5) Stream response with SSE 6) Show badge GEMINI 2.5 FLASH LITE LIVE ⚡ green pulse. For JWT Blacklist give Set code, for PostgreSQL indexing give CREATE INDEX CONCURRENTLY code, for SQL Pool give mysql2 pool 20 limit code. Never show 3 dots for more than 300ms. Start streaming within 400ms.`;
+      const systemInstruction = `You are Bridge Buddy & AI Career Advisor running on Gemini 3.8. Explicitly reference iGOT Karmayogi course databases, competency frameworks, and official statistics standards for reasoning and skill gap recommendations. Rules: 1) Answer in max 90 words 2) Focus on iGOT upskilling and career roadmap 3) Show badge GEMINI 3.8 KARMAYOGI ⚡ green pulse.`;
 
       const contents = [];
       if (Array.isArray(history) && history.length > 0) {
