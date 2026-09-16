@@ -62,21 +62,28 @@ export const SkillIntelligenceView: React.FC<SkillIntelligenceProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
 
   const [igotCourses, setIgotCourses] = useState<IGotCourse[]>([]);
+  const [student, setStudent] = useState<any>(null);
 
   const overall = calculateOverallSkillScore(skills);
   const tech = calculateTechnicalSkillScore(skills);
   const soft = calculateSoftSkillScore(skills);
 
   useEffect(() => {
-    async function loadIgot() {
+    async function loadData() {
         try {
-            const courses = await igotService.fetchRecommendations("Administrator"); // Placeholder role
-            setIgotCourses(courses.slice(0, 3));
+            const res = await fetch('/api/student');
+            const studentData = await res.json();
+            setStudent(studentData);
+            
+            if (studentData?.targetRole) {
+              const courses = await igotService.fetchRecommendations(studentData.targetRole);
+              setIgotCourses(courses);
+            }
         } catch (e) {
-            console.error(e);
+            console.error("Failed to load data", e);
         }
     }
-    loadIgot();
+    loadData();
   }, []);
 
   const handleNavAssessment = () => {
