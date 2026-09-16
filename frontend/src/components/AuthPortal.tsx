@@ -1,60 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  X, 
-  GraduationCap, 
-  Users, 
-  Building2, 
-  Briefcase,
-  ArrowRight,
-  Lock,
-  Mail,
-  User,
-  Hash,
-  Calendar,
-  Sparkles,
-  CheckCircle2,
-  Plus,
-  Layers,
-  Camera,
-  MapPin,
-  RefreshCw,
-  ShieldCheck
-} from 'lucide-react';
-import { UserRole } from '../types';
-import { 
-  UNIS, 
-  DEPARTMENTS, 
-  MENTOR_COMPANIES_DATA, 
-  MENTOR_EXPERTISE_TAGS,
-  CollegeItem 
-} from '../data/colleges';
-import { UniversityDropdown } from './UniversityDropdown';
-import { detectAccurateLocation, syncLocationAcrossApp } from '../utils/locationService';
-import { Logo } from './Logo';
+import React, { useState } from 'react';
+import { Sparkles, ShieldCheck, ArrowRight, UserCheck, Lock, User, Shield } from 'lucide-react';
+import { UserRole, StudentProfile } from '../types';
 
 export interface AuthSuccessPayload {
-  name: string;
   role: UserRole;
-  email: string;
-  department?: string;
-  college?: CollegeItem | null;
-  batch?: string;
-  rollNo?: string;
-  company?: string;
-  expertise?: string[];
-  photo?: string;
-  location?: string;
-  mode: 'login' | 'register';
+  token?: string;
+  student?: StudentProfile;
 }
 
 interface AuthPortalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialRole?: UserRole;
-  initialMode?: 'login' | 'register';
   onAuthSuccess: (payload: AuthSuccessPayload) => void;
 }
 
+export const AuthPortal: React.FC<AuthPortalProps> = ({ isOpen, onClose, onAuthSuccess }) => {
+  const [activeTab, setActiveTab] = useState<'learner' | 'administrator'>('learner');
+  const [email, setEmail] = useState('adarsh.pratap@mjpru.ac.in');
+  const [password, setPassword] = useState('password123');
 export const AuthPortal: React.FC<AuthPortalProps> = ({
   isOpen,
   onClose,
@@ -142,58 +105,23 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
 
   if (!isOpen) return null;
 
-  // Toggle expertise tags for mentor
-  const toggleExpertise = (tag: string) => {
-    if (selectedExpertise.includes(tag)) {
-      setSelectedExpertise(prev => prev.filter(t => t !== tag));
-    } else {
-      setSelectedExpertise(prev => [...prev, tag]);
-    }
-  };
-
-  const handleAddCustomTag = (e: React.KeyboardEvent | React.MouseEvent) => {
-    if ('key' in e && e.key !== 'Enter') return;
-    if (newTagInput.trim() && !selectedExpertise.includes(newTagInput.trim())) {
-      setSelectedExpertise(prev => [...prev, newTagInput.trim()]);
-      setNewTagInput('');
-    }
-  };
-
-  // Photo Upload Handler with FileReader base64
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      setPhotoPreview(base64);
-      localStorage.setItem('userPhoto', base64);
-      localStorage.setItem('profilePhoto', base64);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // GPS & IP Location auto detector
-  const getCurrentLocation = async (): Promise<{ location: string; lat: number; lng: number }> => {
-    try {
-      const res = await detectAccurateLocation();
-      setDetectedLocation(res.location);
-      return { 
-        location: res.location, 
-        lat: res.lat || 28.3670, 
-        lng: res.lng || 79.4304 
-      };
-    } catch {
-      const fallback = 'Bareilly, Uttar Pradesh, India';
-      setDetectedLocation(fallback);
-      return { location: fallback, lat: 28.3670, lng: 79.4304 };
-    }
-  };
-
-  // CRITICAL PATHWAY AUTH SUBMISSION
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const role: UserRole = activeTab === 'learner' ? 'student' : 'hod';
+    onAuthSuccess({
+      role,
+      token: 'mock_jwt_token_sih26101',
+      student: {
+        id: 1,
+        name: activeTab === 'learner' ? 'Adarsh Pratap Singh' : 'Dr. Administrator',
+        email,
+        targetRole: activeTab === 'learner' ? 'AI & Official Statistics Systems Architect' : 'System Administrator / HOD',
+        careerReadiness: 96,
+        avatar: '',
+        skills: ['Python', 'SQL', 'React', 'Official Statistics']
+      }
+    });
+    onClose();
     setIsSubmitting(true);
 
     try {
@@ -292,24 +220,66 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 font-sans select-none animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-[#0B0F2A] border border-white/10 rounded-2xl shadow-2xl overflow-hidden text-slate-200 my-8">
-        {/* Header Ribbon & Close Button */}
-        <div className="px-4 py-4 border-b border-white/6 flex items-start justify-between bg-[#0B0F2A]">
-          <Logo 
-            showText={true} 
-            subtitle={true} 
-            iconSize={36} 
-          />
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+      <div className="bg-[#0B132B] border border-[#1E2964] rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6">
+        
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
+            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+            Project ID: sih26101 - Smart India Hackathon
+          </div>
+          <h2 className="text-xl font-black text-white">Ladder Secure Authentication</h2>
+          <p className="text-xs text-slate-400">Select your portal access mode below.</p>
+        </div>
+
+        {/* Tab Form */}
+        <div className="grid grid-cols-2 gap-2 bg-[#070B1E] p-1.5 rounded-xl border border-[#1E2964]">
           <button
-            onClick={onClose}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
-            title="Close Portal"
+            type="button"
+            onClick={() => {
+              setActiveTab('learner');
+              setEmail('adarsh.pratap@mjpru.ac.in');
+            }}
+            className={`py-2 px-4 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              activeTab === 'learner'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
           >
-            <X className="w-4 h-4" />
+            <User className="w-3.5 h-3.5" />
+            Learner
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('administrator');
+              setEmail('admin.mjpru@gov.in');
+            }}
+            className={`py-2 px-4 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              activeTab === 'administrator'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Shield className="w-3.5 h-3.5" />
+            Administrator
           </button>
         </div>
 
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-300">
+              {activeTab === 'learner' ? 'Learner Email Address' : 'Administrator Email Address'}
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full bg-[#0F172A] border border-[#1E2964] rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            />
         {/* Dual Switchers: 1. Mode Toggle [Sign In] [Register] + 2. Role Tabs [Student][Mentor][HOD][Recruiter] */}
         <div className="px-6 pt-4 pb-2 space-y-3 bg-[#0E1538]/50">
           {/* Mode Toggle [Sign In] [Register Student / User] */}
@@ -366,46 +336,25 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
               <span>Admin</span>
             </button>
           </div>
-        </div>
 
-        {/* Form Container */}
-        <form onSubmit={handleAuth} className="p-6 space-y-4 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10">
-          
-          {/* PHOTO UPLOAD & PREVIEW (Available in Register and Login) */}
-          <div className="flex flex-col items-center justify-center pb-2">
-            <input 
-              type="file" 
-              accept="image/*" 
-              id="photoUpload" 
-              className="hidden" 
-              onChange={handlePhotoUpload} 
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-300">Password / Access Token</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full bg-[#0F172A] border border-[#1E2964] rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
             />
-            <label
-              htmlFor="photoUpload"
-              className="w-20 h-20 rounded-full border-2 border-dashed border-white/20 bg-white/5 hover:border-[#7C5CFC] hover:bg-[#7C5CFC]/10 flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all relative group"
-              title="Upload Profile Photo"
-            >
-              {photoPreview ? (
-                <img 
-                  src={photoPreview} 
-                  alt="Avatar Preview" 
-                  className="w-full h-full object-cover" 
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center p-1">
-                  <Camera className="w-5 h-5 text-slate-400 group-hover:text-[#7C5CFC] transition-colors" />
-                  <span className="text-[9px] text-white/50 group-hover:text-white mt-1">Photo</span>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                <Camera className="w-4 h-4 text-white" />
-              </div>
-            </label>
-            <span className="text-[10px] text-white/40 mt-1.5">
-              Click circle to upload profile photo (PNG, JPG, WebP)
-            </span>
           </div>
 
+          <button
+            type="submit"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 hover:opacity-95 transition-all cursor-pointer mt-2"
+          >
+            <span>Login as {activeTab === 'learner' ? 'Learner' : 'Administrator'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
           {/* 1. LEARNER PATHWAY */}
           {roleTab === 'Learner' && (
             <>
@@ -801,9 +750,8 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
             </button>
           </div>
         </form>
+
       </div>
     </div>
   );
 };
-
-export default AuthPortal;
