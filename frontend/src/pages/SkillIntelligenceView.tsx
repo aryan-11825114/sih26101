@@ -7,6 +7,7 @@ import {
   CheckCircle2, 
   ArrowRight,
   BookOpen,
+  BookOpenText,
   Code,
   Layers,
   Award,
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 import { SkillItem } from '../types';
 import { INITIAL_SKILLS, calculateOverallSkillScore, calculateTechnicalSkillScore, calculateSoftSkillScore } from '../data/portalData';
+import { igotService, IGotCourse } from '../services/igotApi';
 import { getStudentSkills } from '../services/studentCareerService';
 
 interface SkillIntelligenceProps {
@@ -59,9 +61,30 @@ export const SkillIntelligenceView: React.FC<SkillIntelligenceProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'technical' | 'soft'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [igotCourses, setIgotCourses] = useState<IGotCourse[]>([]);
+  const [student, setStudent] = useState<any>(null);
+
   const overall = calculateOverallSkillScore(skills);
   const tech = calculateTechnicalSkillScore(skills);
   const soft = calculateSoftSkillScore(skills);
+
+  useEffect(() => {
+    async function loadData() {
+        try {
+            const res = await fetch('/api/student');
+            const studentData = await res.json();
+            setStudent(studentData);
+            
+            if (studentData?.targetRole) {
+              const courses = await igotService.fetchRecommendations(studentData.targetRole);
+              setIgotCourses(courses);
+            }
+        } catch (e) {
+            console.error("Failed to load data", e);
+        }
+    }
+    loadData();
+  }, []);
 
   const handleNavAssessment = () => {
     if (onNavigateToAssessment) onNavigateToAssessment();
@@ -134,108 +157,62 @@ export const SkillIntelligenceView: React.FC<SkillIntelligenceProps> = ({
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="p-4 rounded-xl bg-[#0B1033] border border-[#1C265E] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search skills (e.g. Python, AWS, SQL)..."
-            className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-[#070B1E] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-[#7C5CFC]"
-          />
-        </div>
-
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              selectedCategory === 'all' ? 'bg-[#7C5CFC] text-white' : 'bg-[#070B1E] text-slate-400 hover:text-white'
-            }`}
-          >
-            All ({skills.length})
-          </button>
-          <button
-            onClick={() => setSelectedCategory('technical')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              selectedCategory === 'technical' ? 'bg-[#7C5CFC] text-white' : 'bg-[#070B1E] text-slate-400 hover:text-white'
-            }`}
-          >
-            Technical
-          </button>
-          <button
-            onClick={() => setSelectedCategory('soft')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              selectedCategory === 'soft' ? 'bg-[#7C5CFC] text-white' : 'bg-[#070B1E] text-slate-400 hover:text-white'
-            }`}
-          >
-            Soft Skills
-          </button>
+      {/* Skills Intelligence - Simplified */}
+      <div className="p-6 rounded-2xl bg-[#0E1538] border border-[#1E2964] shadow-xl">
+        <h2 className="text-lg font-extrabold text-white mb-6 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-emerald-400" />
+            iGOT Recommended Government Courses
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {igotCourses.map((course) => (
+                <div key={course.id} className="p-5 rounded-2xl bg-[#0B1033] border border-[#1C265E] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-lg">
+                    <div>
+                        <p className="text-sm font-bold text-white group-hover:text-[#C4B5FD] transition-colors mb-2">{course.title}</p>
+                        <p className="text-[11px] text-slate-400 mb-1">{course.provider}</p>
+                        <p className="text-[11px] text-emerald-400 font-bold mb-4">{course.category} • {course.duration}</p>
+                    </div>
+                    <a href="#" className="w-full py-2 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg border border-emerald-500/20 hover:bg-emerald-500/30 text-center">View Course</a>
+                </div>
+            ))}
         </div>
       </div>
 
-      {/* Skills Matrix Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredSkills.map((skill) => {
-          const isMastered = skill.level >= 4;
-          return (
-            <div 
-              key={skill.id} 
-              className="p-5 rounded-2xl bg-[#0B1033] border border-[#1C265E] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-lg"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <span className="text-xs font-black text-white group-hover:text-[#C4B5FD] transition-colors">
-                    {skill.name}
-                  </span>
-                  <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
-                    skill.verified 
-                      ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' 
-                      : 'bg-amber-500/10 text-amber-300 border-amber-500/20'
-                  }`}>
-                    {skill.verified ? 'Verified Ledger ✓' : 'Self-Reported'}
-                  </span>
+      {/* iGOT & Quiz Generator Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* iGOT Recommendations */}
+        <div className="p-6 rounded-2xl bg-[#0E1538] border border-[#1E2964] shadow-xl">
+          <h2 className="text-lg font-extrabold text-white mb-4 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-emerald-400" />
+            iGOT Recommended Courses
+          </h2>
+          <div className="space-y-3">
+             {igotCourses.map((course) => (
+                <div key={course.id} className="p-3 rounded-xl bg-[#1A224D] border border-white/5 flex items-center justify-between">
+                    <div>
+                        <p className="text-xs font-bold text-white">{course.title}</p>
+                        <p className="text-[10px] text-slate-400">{course.provider} • {course.duration}</p>
+                    </div>
+                    <a href="#" className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-lg border border-emerald-500/20 hover:bg-emerald-500/30">View Course</a>
                 </div>
+             ))}
+          </div>
+        </div>
 
-                <div className="flex items-center justify-between text-xs my-2">
-                  <span className="text-slate-400 font-semibold">Proficiency:</span>
-                  <span className="text-cyan-300 font-bold">Level {skill.level} of 5 ({skill.score}%)</span>
-                </div>
-
-                <div className="w-full bg-[#18214D] h-2 rounded-full overflow-hidden mb-3">
-                  <div 
-                    className={`h-full rounded-full transition-all ${
-                      isMastered ? 'bg-emerald-400' : 'bg-cyan-400'
-                    }`}
-                    style={{ width: `${skill.score}%` }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mb-4">
-                  <span>Assessments: {(skill as any).assessmentsCompleted || 2}</span>
-                  <span>Gigs verified: {(skill as any).gigsCompleted || 1}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-3 border-t border-[#182352]">
-                <button
-                  onClick={handleNavLearning}
-                  className="flex-1 py-1.5 rounded-lg bg-[#141C48] hover:bg-[#1D296C] text-slate-200 text-xs font-bold transition-colors cursor-pointer text-center"
-                >
-                  Bridge Gap
-                </button>
-                <button
-                  onClick={handleNavGigs}
-                  className="flex-1 py-1.5 rounded-lg bg-[#7C5CFC] hover:bg-[#6D4AE8] text-white text-xs font-bold shadow transition-all cursor-pointer text-center"
-                >
-                  Solve Gig
-                </button>
-              </div>
-            </div>
-          );
-        })}
+        {/* AI Quiz Generator */}
+        <div className="p-6 rounded-2xl bg-[#0E1538] border border-[#1E2964] shadow-xl">
+          <h2 className="text-lg font-extrabold text-white mb-4 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-400" />
+            AI Quiz Generator
+          </h2>
+          <p className="text-xs text-slate-400 mb-4">Upload learning materials to generate assessments instantly.</p>
+          <div className="h-24 flex items-center justify-center border-2 border-dashed border-white/10 rounded-xl bg-[#1A224D] hover:border-amber-500/50 transition-colors cursor-pointer">
+            <button className="flex items-center gap-2 text-amber-400 text-xs font-bold">
+              <BookOpenText className="w-4 h-4" /> Click to upload documents/videos
+            </button>
+          </div>
+        </div>
       </div>
+
     </div>
   );
 };

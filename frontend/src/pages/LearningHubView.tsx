@@ -22,6 +22,7 @@ import {
 import confetti from 'canvas-confetti';
 import { StudentProfile } from '../types';
 import { getLearningCourses, updateCourseProgress, getStudentSkills } from '../services/studentCareerService';
+import { igotService, IGotCourse } from '../services/igotApi';
 
 export interface CourseLesson {
   id: string;
@@ -306,8 +307,40 @@ export const LearningHubView: React.FC<LearningHubViewProps> = ({
   const [celebrationMessage, setCelebrationMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    setCourses(normalizeHubCourses());
-  }, []);
+    async function loadData() {
+      const baseCourses = normalizeHubCourses();
+      if (student?.targetRole) {
+        try {
+          const igotCourses = await igotService.fetchRecommendations(student.targetRole);
+          const mappedCourses: HubCourse[] = igotCourses.map(c => ({
+            id: c.id,
+            title: c.title,
+            provider: c.provider,
+            category: c.category,
+            level: c.level === 'Beginner' ? 'Beginner' : c.level === 'Advanced' ? 'Advanced' : 'Intermediate',
+            duration: c.duration,
+            status: c.status,
+            progressPercent: 0,
+            completedModules: 0,
+            modulesCount: 5,
+            skillsCovered: [c.category],
+            recommendationReason: 'Recommended by iGOT Karmayogi',
+            rating: 5,
+            targetedSkill: c.category,
+            targetSkillLevel: 4,
+            lessons: []
+          }));
+          setCourses([...baseCourses, ...mappedCourses]);
+        } catch (e) {
+          console.error("Failed to load iGOT courses", e);
+          setCourses(baseCourses);
+        }
+      } else {
+        setCourses(baseCourses);
+      }
+    }
+    loadData();
+  }, [student]);
 
   const handleStartCourse = (course: HubCourse) => {
     setSelectedCourse(course);
@@ -331,7 +364,11 @@ export const LearningHubView: React.FC<LearningHubViewProps> = ({
           const newStatus = newProgress >= 100 ? ('Completed' as const) : newProgress > 0 ? ('In Progress' as const) : ('Not Started' as const);
 
           // Update backend service persistence
-          updateCourseProgress(courseId, 1);
+          if (c.provider === 'iGOT Karmayogi') {
+            igotService.updateCourseProgress(courseId, newProgress);
+          } else {
+            updateCourseProgress(courseId, 1);
+          }
 
           // If reached 100% completion
           if (newProgress === 100 && c.progressPercent < 100) {

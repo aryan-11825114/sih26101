@@ -538,7 +538,7 @@ CREATE INDEX idx_cohort_readiness ON students(batch, career_readiness DESC);
 
 export default defineConfig({
   root: path.resolve(__dirname),
-  plugins: [react(), tailwindcss(), devApiPlugin()],
+  plugins: [react(), tailwindcss()],
   build: {
     outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,

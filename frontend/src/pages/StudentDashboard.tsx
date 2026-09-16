@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { StudentProfile, PassportRecord } from '../types';
 import { SkillTwinAndQuests } from '../components/SkillTwinAndQuests';
+import { RecommendedCourseCard } from '../components/RecommendedCourseCard';
 import { 
   getStudentSkills, 
   getSkillGaps, 
@@ -43,11 +44,20 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 }) => {
   const [skills, setSkills] = useState(() => getStudentSkills());
   const [skillGaps, setSkillGaps] = useState(() => getSkillGaps());
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [filter, setFilter] = useState('Recommended');
 
   useEffect(() => {
     setSkills(getStudentSkills());
     setSkillGaps(getSkillGaps());
-  }, []);
+    
+    // Fetch dynamic recommendations
+    if (student?.targetRole) {
+        fetch(`/api/ai/igot/recommendations?profession=${encodeURIComponent(student.targetRole)}`)
+            .then(res => res.json())
+            .then(data => setRecommendations(data.recommendations));
+    }
+  }, [student]);
 
   const readiness = React.useMemo(() => calculateReadinessMetrics(skills), [skills]);
   const overallScore = readiness.overallSkillScore;
@@ -288,98 +298,36 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
       {/* 3. TARGET ROLE COMPETENCY ROADMAPS & LEARNING TRACKS */}
       <div className="p-5 rounded-2xl bg-[#0B1033] border border-[#1C265E] shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
               <BookOpen className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white">Target Role Competency Roadmaps & Learning Tracks</h2>
-              <p className="text-[11px] text-slate-400">Curated industry-grade learning paths and hands-on skill sprints</p>
+              <h2 className="text-sm font-bold text-white">iGOT Recommended Courses</h2>
+              <p className="text-[11px] text-slate-400">Personalized learning paths mapped to your competency gaps</p>
             </div>
           </div>
-
-          <button
-            onClick={() => onNavigate('learning')}
-            className="text-xs font-bold text-[#A78BFA] hover:text-white flex items-center gap-1 transition-colors cursor-pointer self-start sm:self-auto"
+          
+          <select 
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="bg-[#1A224D] text-[10px] font-bold text-slate-300 px-3 py-1.5 rounded-lg border border-white/5 outline-none"
           >
-            <span>Open Learning Hub</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+            {['Recommended', 'Profession', 'Skill Gap', 'Technical Skills', 'Soft Skills'].map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div 
-            onClick={() => onNavigate('learning')}
-            className="p-4 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-sm cursor-pointer"
-          >
-            <div>
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Cloud Infrastructure</span>
-                <span className="text-[10px] font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                  Sprint 3 of 5
-                </span>
-              </div>
-              <h3 className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors mb-1.5">
-                AWS Cloud Architecture & Terraform
-              </h3>
-              <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">
-                Deploy VPC, ECS Fargate containers, Application Load Balancers, and automated CI/CD pipelines.
-              </p>
-            </div>
-            <div className="pt-3 mt-3 border-t border-[#18214D] flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-mono text-[11px]">8 Modules • 14 Hours</span>
-              <span className="text-[#A78BFA] font-bold group-hover:underline">Resume Course →</span>
-            </div>
-          </div>
-
-          <div 
-            onClick={() => onNavigate('learning')}
-            className="p-4 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-sm cursor-pointer"
-          >
-            <div>
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">System Design</span>
-                <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                  Ready to Start
-                </span>
-              </div>
-              <h3 className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors mb-1.5">
-                Distributed Systems & Microservices
-              </h3>
-              <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">
-                Master Kafka message brokers, database partitioning, Redis caching layers, and high-concurrency architectures.
-              </p>
-            </div>
-            <div className="pt-3 mt-3 border-t border-[#18214D] flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-mono text-[11px]">10 Modules • 18 Hours</span>
-              <span className="text-[#A78BFA] font-bold group-hover:underline">Start Track →</span>
-            </div>
-          </div>
-
-          <div 
-            onClick={() => onNavigate('assessment')}
-            className="p-4 rounded-xl bg-[#0E1538] border border-[#1E2964] hover:border-[#7C5CFC] transition-all flex flex-col justify-between group shadow-sm cursor-pointer"
-          >
-            <div>
-              <div className="flex items-start justify-between gap-2 mb-2">
-                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Skill Assessment</span>
-                <span className="text-[10px] font-black text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20">
-                  Benchmark Test
-                </span>
-              </div>
-              <h3 className="text-xs font-bold text-white group-hover:text-[#C4B5FD] transition-colors mb-1.5">
-                Algorithms, Data Structures & Concurrency
-              </h3>
-              <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">
-                Validate your computational complexity and algorithm design against real-time industry benchmark tests.
-              </p>
-            </div>
-            <div className="pt-3 mt-3 border-t border-[#18214D] flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-mono text-[11px]">30 Questions • 45 Mins</span>
-              <span className="text-cyan-400 font-bold group-hover:underline">Take Assessment →</span>
-            </div>
-          </div>
+            {recommendations.map((course: any) => (
+                <RecommendedCourseCard 
+                    key={course.id}
+                    title={course.title}
+                    duration={course.duration}
+                    difficulty={course.level}
+                    onView={() => window.open('#', '_blank')}
+                />
+            ))}
         </div>
       </div>
 
