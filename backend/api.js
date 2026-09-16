@@ -543,13 +543,28 @@ function registerApiRoutes(app) {
 
   /* ================= SKILL INTELLIGENCE (iGOT Integration) ================= */
   app.get("/api/ai/igot/recommendations", (req, res) => {
-    res.json({
-        recommendations: [
-            { id: 1, title: "AI in Statistical Systems", provider: "iGOT Karmayogi", status: "Not Started" },
-            { id: 2, title: "Big Data Analytics for Policy", provider: "iGOT Karmayogi", status: "In Progress" },
-            { id: 3, title: "Digital Public Infrastructure", provider: "iGOT Karmayogi", status: "Not Started" }
-        ]
-    });
+    const { profession, skills } = req.query;
+    
+    // Simple dynamic mapping logic
+    let recommendations = [];
+    if (profession === 'Software Developer') {
+        recommendations = [
+            { id: 1, title: "Cloud Computing Fundamentals", provider: "iGOT Karmayogi", category: "Technical", level: "Intermediate", duration: "10h" },
+            { id: 2, title: "AI/ML for Developers", provider: "iGOT Karmayogi", category: "Technical", level: "Advanced", duration: "15h" }
+        ];
+    } else {
+        recommendations = [
+            { id: 3, title: "Public Governance Basics", provider: "iGOT Karmayogi", category: "Digital Governance", level: "Beginner", duration: "5h" }
+        ];
+    }
+    
+    res.json({ recommendations });
+  });
+
+  app.post("/api/ai/igot/progress", (req, res) => {
+    const { courseId, progress } = req.body;
+    console.log(`Updating progress for course ${courseId} to ${progress}%`);
+    res.json({ success: true });
   });
 
   app.post("/api/ai/quiz/generate", async (req, res) => {
