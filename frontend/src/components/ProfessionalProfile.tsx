@@ -39,6 +39,8 @@ import {
 } from 'lucide-react';
 import { StudentProfile, UserRole } from '../types';
 import { detectAccurateLocation, syncLocationAcrossApp, normalizeLocationString } from '../utils/locationService';
+import { ActivityHeatmap } from './ActivityHeatmap';
+import { LearningHoursTracker } from './LearningHoursTracker';
 
 export interface UserProfileData {
   name: string;
@@ -138,7 +140,7 @@ export const ProfessionalProfile: React.FC<ProfessionalProfileProps> = ({
 
   // Sub-feature Modals State
   const [activeModal, setActiveModal] = useState<
-    'dna' | 'roadmap' | 'certifications' | 'applications' | 'settings' | null
+    'dna' | 'roadmap' | 'certifications' | 'applications' | 'settings' | 'learning_hours' | 'heatmap' | null
   >(null);
 
   // Sync on open
@@ -572,6 +574,27 @@ export const ProfessionalProfile: React.FC<ProfessionalProfileProps> = ({
                 </span>
               </div>
 
+              <LearningHoursTracker 
+                onClick={() => setActiveModal('learning_hours')} 
+                totalHours="28.5 Hrs" 
+              />
+
+              <div 
+                onClick={() => setActiveModal('heatmap')}
+                className="p-3 rounded-xl bg-[#1A1F3D]/60 hover:bg-[#1A1F3D] border border-white/5 hover:border-[#7C5CFC]/40 transition-all flex items-center justify-between cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-white">Activity Heatmap</div>
+                    <div className="text-[10px] text-white/50">Daily contributions & streak graph</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white" />
+              </div>
+
               <div 
                 onClick={() => setActiveModal('roadmap')}
                 className="p-3 rounded-xl bg-[#1A1F3D]/60 hover:bg-[#1A1F3D] border border-white/5 hover:border-[#7C5CFC]/40 transition-all flex items-center justify-between cursor-pointer group"
@@ -849,6 +872,66 @@ export const ProfessionalProfile: React.FC<ProfessionalProfileProps> = ({
                 </div>
                 <span className="text-[10px] font-mono px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded">Minted</span>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === 'learning_hours' && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#0B0F2A] border border-white/10 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl text-slate-200 animate-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <Clock className="w-4 h-4 text-cyan-400" />
+                <span>Learning Hours Tracker</span>
+              </h4>
+              <button onClick={() => setActiveModal(null)} className="p-1 rounded-lg bg-white/5 text-slate-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-3 text-xs">
+              <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-semibold text-cyan-400">Total Time Logged</div>
+                  <div className="text-xl font-black text-white">28.5 Hours</div>
+                </div>
+                <span className="px-2.5 py-1 bg-cyan-500/20 text-cyan-200 font-bold text-[10px] rounded-lg border border-cyan-500/30">
+                  Active Streak: 14 Days
+                </span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-[11px] p-2 rounded-lg bg-white/5">
+                  <span className="text-slate-300">AI & Python Modules</span>
+                  <span className="font-bold text-white">12.0 Hrs</span>
+                </div>
+                <div className="flex justify-between text-[11px] p-2 rounded-lg bg-white/5">
+                  <span className="text-slate-300">Official Statistics & iGOT</span>
+                  <span className="font-bold text-white">9.5 Hrs</span>
+                </div>
+                <div className="flex justify-between text-[11px] p-2 rounded-lg bg-white/5">
+                  <span className="text-slate-300">Micro-Internship Sprints</span>
+                  <span className="font-bold text-white">7.0 Hrs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === 'heatmap' && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#0B0F2A] border border-white/10 rounded-2xl w-full max-w-2xl p-6 space-y-4 shadow-2xl text-slate-200 animate-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-cyan-400" />
+                <span>Activity Heatmap & Contribution Graph</span>
+              </h4>
+              <button onClick={() => setActiveModal(null)} className="p-1 rounded-lg bg-white/5 text-slate-400 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div>
+              <ActivityHeatmap />
             </div>
           </div>
         </div>
