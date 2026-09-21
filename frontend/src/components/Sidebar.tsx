@@ -14,6 +14,7 @@ import {
   Layers,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   Sparkles,
   LogOut,
   User as UserIcon,
@@ -59,6 +60,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse
 }) => {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
+  const [geminiVersion, setGeminiVersion] = useState<string>(() => {
+    return localStorage.getItem('geminiVersion') || 'gemini-3.8';
+  });
+
+  const handleGeminiVersionChange = (version: string) => {
+    setGeminiVersion(version);
+    localStorage.setItem('geminiVersion', version);
+    window.dispatchEvent(new CustomEvent('gemini-version-change', { detail: { version } }));
+  };
 
   const getInitials = (name: string) => {
     if (!name) return 'SB';
@@ -287,7 +297,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     id="nav-helpdesk"
                     onClick={() => handleTabClick('helpdesk')}
-                    title="AI Help Desk & Advisor"
+                    title="AI Help Desk"
                     className={`w-full flex items-center ${collapsed ? 'justify-center w-10 h-10 mx-auto px-0 py-0 gap-0' : 'gap-3 px-2.5 py-2'} rounded-xl text-[13px] font-semibold transition-all ${
                       activeTab === 'helpdesk'
                         ? 'bg-[#7C5CFC]/20 text-[#C4B5FD] border border-[#7C5CFC]/30 shadow-sm font-bold'
@@ -295,7 +305,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }`}
                   >
                     <HelpCircle className="w-4 h-4 text-violet-400 shrink-0" />
-                    {!collapsed && <span className="truncate">AI Help Desk (Bridge Buddy)</span>}
+                    {!collapsed && <span className="truncate">AI Help Desk</span>}
                   </button>
                 </div>
               </div>
@@ -566,6 +576,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
+        </div>
+
+        {/* Gemini Version Selector Component */}
+        <div id="gemini-version-selector" className="px-3.5 py-2.5 border-t border-white/5 bg-[#090D25]/95">
+          {!collapsed ? (
+            <div className="space-y-1.5">
+              <label 
+                htmlFor="gemini-version-dropdown" 
+                className="text-[11px] font-semibold text-slate-300 flex items-center justify-between"
+              >
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Select Gemini Version</span>
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  Currently Gemini 3.8
+                </span>
+              </label>
+              
+              <div className="relative">
+                <select
+                  id="gemini-version-dropdown"
+                  value={geminiVersion}
+                  onChange={(e) => handleGeminiVersionChange(e.target.value)}
+                  className="w-full bg-[#141938] hover:bg-[#1A2149] border border-white/10 hover:border-[#7C5CFC]/50 text-white text-xs font-semibold rounded-xl px-2.5 py-2 outline-none transition-all cursor-pointer appearance-none pr-8 focus:ring-1 focus:ring-[#7C5CFC]"
+                >
+                  <option value="gemini-3.8">Gemini 3.8 (Active)</option>
+                  <option value="gemini-3.8-pro">Gemini 3.8 Pro</option>
+                  <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite</option>
+                  <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                </select>
+                <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-center" title="Select Gemini Version (Currently Gemini 3.8)">
+              <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 cursor-pointer shadow-sm">
+                <Sparkles className="w-4 h-4" />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* User Profile Card & Sign Out */}

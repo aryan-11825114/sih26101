@@ -184,7 +184,7 @@ export const GlobalOmniSearch: React.FC<GlobalOmniSearchProps> = ({
         { id: 'p-certs', title: 'Certifications & Badges', subtitle: 'Verified course certificates and earned skill badges', category: 'Pages', icon: Award, targetTab: 'certs', actionLabel: 'View Certificates' },
         { id: 'p-passport', title: 'Cryptographic Skill Passport', subtitle: 'Verified proof-of-work, hashes & blockchain credentials', category: 'Pages', icon: ShieldCheck, targetTab: 'passport', actionLabel: 'View Passport' },
         { id: 'p-advisor', title: 'AI Career Advisor', subtitle: 'Personalized AI career guidance, strategy & milestones', category: 'Pages', icon: Sparkles, targetTab: 'advisor', actionLabel: 'Consult Advisor' },
-        { id: 'p-helpdesk', title: 'AI Help Desk (Bridge Buddy)', subtitle: 'Interactive 24/7 student support, queries & career assistant', category: 'Pages', icon: HelpCircle, targetTab: 'helpdesk', actionLabel: 'Open Help Desk' },
+        { id: 'p-helpdesk', title: 'AI Help Desk', subtitle: 'Interactive 24/7 student support, queries & career assistant', category: 'Pages', icon: HelpCircle, targetTab: 'helpdesk', actionLabel: 'Open Help Desk' },
         { id: 'p-trust', title: 'Trust & Verification Ledger', subtitle: 'Institutional verification and accreditation status', category: 'Pages', icon: ShieldCheck, targetTab: 'trust', actionLabel: 'Check Trust' }
       );
 

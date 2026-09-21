@@ -39,15 +39,16 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
   onNavigateTab 
 }) => {
   const navigate = onNavigate || onNavigateTab;
+  const studentName = student?.name || localStorage.getItem('userName') || 'Adarsh Pratap Singh';
 
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'm1',
       sender: 'ai',
-      text: `Hello ${student?.name || 'Adarsh'}! I am your AI Career Advisor. Based on your verified Skill Twin DNA (Python L5, PostgreSQL L4, React L3), you are currently at 74% Industry Readiness for Full Stack Software Engineer roles. How can I help guide your placement roadmap today?`,
+      text: `Hello ${studentName}! I am your updated iGOT integrated Mentor (running on Gemini 3.8). Based on your iGOT verified Skill-DNA (Python, SQL, React), you are at 74% Industry Readiness for 'iGOT-Aligned Full Stack Software Engineer' roles. How can I guide your iGOT upskilling and career roadmap today?`,
       timestamp: 'Just now',
       suggestedAction: {
-        label: 'View Skill Gap Summary',
+        label: 'View iGOT Skill-Gap Summary →',
         tab: 'skill-gap'
       }
     }
@@ -58,10 +59,10 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const predefinedPrompts = [
-    "What priority skills should I learn next?",
-    "Am I eligible for TCS Digital & Infosys?",
-    "Generate 30-day placement preparation roadmap",
-    "How do I boost my AWS & Cloud Architecture score?"
+    "Generate an iGOT upskilling path",
+    "What priority iGOT competencies should I build next?",
+    "Explain my 74% iGOT readiness score",
+    "Recommend iGOT Karmayogi certified courses"
   ];
 
   const handleSendPrompt = async (text: string) => {
@@ -90,14 +91,15 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
         const data = await response.json();
         console.log('Received response from AI advisor:', data);
 
-        if (!response.ok || !data.success) {
-            throw new Error(data.error || 'Failed to get a response');
+        const aiText = data.reply || (data.success && data.message) || data.message;
+        if (!response.ok || !aiText) {
+            throw new Error(data.error || 'Failed to get a response from AI mentor');
         }
 
         const aiMsg: Message = {
             id: `ai_${Date.now()}`,
             sender: 'ai',
-            text: data.reply,
+            text: aiText,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
 
@@ -120,15 +122,49 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
             <h1 className="text-xl font-extrabold text-white">AI Career Advisor & Strategic Copilot</h1>
           </div>
           <p className="text-xs text-slate-300">
-            Real-time personalized placement guidance, skill roadmap planning, and hiring analytics.
+            Real-time personalized placement guidance, iGOT Karmayogi competency mapping, and Gemini 3.8 skill roadmap planning.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1.5 rounded-xl">
-            ⚡ Model: Gemini 2.5 Pro Career Engine
+          <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>⚡ Model: Gemini 3.8 iGOT Career Engine</span>
           </span>
         </div>
+      </div>
+
+      {/* Feature Notification Card / Announcement Banner */}
+      <div 
+        id="igot-gemini38-banner"
+        className="p-4 rounded-2xl bg-gradient-to-r from-[#7C5CFC]/20 via-indigo-950/40 to-cyan-950/30 border border-[#7C5CFC]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg"
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-[#7C5CFC]/25 text-cyan-300 border border-cyan-500/40 flex items-center justify-center shrink-0">
+            <Sparkles className="w-4 h-4 text-cyan-300 animate-pulse" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                iGOT Karmayogi
+              </span>
+              <span className="text-[10px] font-bold text-purple-300">
+                Gemini 3.8 Integrated
+              </span>
+            </div>
+            <p className="text-xs font-semibold text-white mt-0.5 truncate sm:whitespace-normal">
+              Update: Gemini 3.8 enhances reasoning and iGOT course recommendation accuracy.
+            </p>
+          </div>
+        </div>
+
+        <button
+          id="btn-try-igot-upskilling"
+          onClick={() => handleSendPrompt("Generate an iGOT upskilling path (Gemini 3.8 optimized)")}
+          className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#7C5CFC] to-[#6366F1] hover:from-[#6D4AE8] hover:to-[#4F46E5] text-white text-xs font-bold shadow-md hover:shadow-purple-500/20 transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+        >
+          <span>Try 'Generate an iGOT upskilling path' (Gemini 3.8 optimized) →</span>
+        </button>
       </div>
 
       {/* Suggested Fast Query Chips */}
@@ -179,7 +215,6 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
                         className="px-3 py-1.5 rounded-lg bg-[#141C48] hover:bg-[#1D296C] text-[#C4B5FD] text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <span>{msg.suggestedAction.label}</span>
-                        <ArrowRight className="w-3 h-3" />
                       </button>
                     </div>
                   )}
@@ -201,7 +236,7 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
           {isTyping && (
             <div className="flex items-center gap-2 text-xs text-purple-400 italic">
               <Sparkles className="w-4 h-4 animate-spin" />
-              <span>Analyzing Ladder Career DNA...</span>
+              <span>Gemini 3.8 analyzing iGOT competency & skill roadmap...</span>
             </div>
           )}
         </div>
@@ -218,7 +253,7 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
             type="text"
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
-            placeholder="Ask about placement eligibility, interview roadmaps, skill priorities..."
+            placeholder="Ask about iGOT eligibility, upskilling paths, or career roadmaps..."
             className="flex-1 px-4 py-2.5 rounded-xl bg-[#070B1E] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-[#7C5CFC]"
           />
           <button

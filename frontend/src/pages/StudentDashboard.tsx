@@ -78,6 +78,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <div className="max-w-xl">
 
 
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="px-3 py-1 rounded-full text-[11px] font-extrabold bg-[#7C5CFC]/20 text-[#C4B5FD] border border-[#7C5CFC]/30 flex items-center gap-1.5 shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                Project ID: sih26101 - Smart India Hackathon
+              </span>
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                iGOT Karmayogi Integrated
+              </span>
+            </div>
+
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
               Welcome back, {student?.name?.split(' ')[0] || 'Adarsh'}
             </h1>
@@ -91,7 +101,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#7C5CFC] to-[#00D9FF] hover:opacity-95 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-purple-500/25 transition-all cursor-pointer"
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>lore Learning Tracks & Hub</span>
+                <span>Explore Learning Tracks & Hub</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
 

@@ -50,7 +50,7 @@ export const BridgeBuddy: React.FC<BridgeBuddyProps> = ({ student, currentRole }
     setMessages([
       {
         sender: 'ai',
-        text: `Hello **${currentName}**! I am your Live Ladder AI Help Desk (Gemini Connected). Ask me anything - JWT, internships, website - I give direct code answers. How can I help, ${currentName}?`,
+        text: `Hello **${currentName}**! I am your Live Ladder AI Help Desk (powered by Gemini 3.8). Ask me about iGOT upskilling, code, micro-internships, or platform features. How can I assist you today?`,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ]);
