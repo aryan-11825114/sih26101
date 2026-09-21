@@ -674,27 +674,9 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     </>
                   )}
 
-                  <UniversityDropdown
-                    selectedCollege={studentCollege}
-                    onSelect={(col) => setStudentCollege(col)}
-                    label="Associated University"
-                  />
+                  
 
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                      Roll Number Verification
-                    </label>
-                    <div className="relative">
-                      <Hash className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        value={studentRollNo}
-                        onChange={(e) => setStudentRollNo(e.target.value)}
-                        placeholder="22001015001"
-                        className="w-full bg-[#1A1F3D] border border-white/10 focus:border-[#7C5CFC] rounded-xl pl-9 pr-3 py-2 text-xs text-white outline-none"
-                      />
-                    </div>
-                  </div>
+                  
                 </div>
               )}
             </>
