@@ -1,6 +1,6 @@
 {
-  "name": "Ladder",
-  "description": "Academia-Industry Portal empowering students with skill intelligence, diagnostic assessments, curated learning tracks, and blockchain-verified skill passports.",
+  "name": "Project ID: sih26101 - Smart India Hackathon",
+  "description": "Smart India Hackathon SIH26101 - iGOT Karmayogi integrated Academia-Industry Portal with Gemini 3.8 AI Career Advisor, Skill DNA, and verified learning pathways.",
   "requestFramePermissions": [
     "geolocation"
   ],

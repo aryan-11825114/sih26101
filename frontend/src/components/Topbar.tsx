@@ -141,6 +141,22 @@ export const Topbar: React.FC<TopbarProps> = ({
         />
       </div>
 
+      {/* Center Section: Main Project Header & Context */}
+      <div 
+        id="project-header-sih"
+        className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-[#7C5CFC]/15 to-cyan-500/10 border border-[#7C5CFC]/30 shadow-sm shrink-0 mx-2"
+      >
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-xs font-bold text-white tracking-wide">
+            Project ID: sih26101 - Smart India Hackathon
+          </span>
+        </div>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30">
+          iGOT Karmayogi
+        </span>
+      </div>
+
       {/* Right action controls */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 ml-2">
         {/* Light / Dark Mode Toggle */}
