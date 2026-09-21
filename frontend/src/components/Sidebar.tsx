@@ -125,7 +125,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="min-w-0">
                   <p className="text-[10px] text-white/30 font-bold uppercase tracking-[1.5px]">Active Role</p>
                   <p className="text-xs font-semibold text-white capitalize truncate">
-                    {currentRole === 'hod' ? 'HOD / Faculty' : currentRole === 'mentor' ? 'Industry Mentor' : currentRole === 'company' ? 'Recruiter' : 'Student Candidate'}
+                    {currentRole === 'hod' ? 'HOD / Faculty' : currentRole === 'mentor' ? 'Industry Mentor' : currentRole === 'company' || currentRole === 'recruiter' ? 'Admin' : 'Learner'}
                   </p>
                 </div>
               </div>
