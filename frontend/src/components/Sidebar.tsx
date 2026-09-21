@@ -293,25 +293,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {!collapsed && <span className="truncate">AI Help Desk (Bridge Buddy)</span>}
                   </button>
                 </div>
-
-                {/* Gemini Version Selector Component */}
-                {!collapsed && (
-                  <div className="mt-4 p-3 rounded-xl bg-[#12193D] border border-indigo-500/30 text-xs space-y-1.5 shadow-md">
-                    <div className="flex items-center justify-between text-[10px] text-indigo-300 font-bold uppercase tracking-wider">
-                      <span>AI Model Engine</span>
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    </div>
-                    <div className="font-semibold text-white text-[11px]">Select Gemini Version (Currently Gemini 3.8)</div>
-                    <select 
-                      className="w-full bg-[#0A0E27] text-cyan-300 border border-indigo-500/40 rounded-lg px-2 py-1.5 text-xs font-mono font-bold focus:outline-none focus:border-cyan-400 cursor-pointer"
-                      defaultValue="Gemini 3.8"
-                    >
-                      <option value="Gemini 3.8">Gemini 3.8 (Active & Optimized)</option>
-                      <option value="Gemini 3.7 Pro">Gemini 3.7 Pro</option>
-                      <option value="Gemini 2.5 Flash">Gemini 2.5 Flash</option>
-                    </select>
-                  </div>
-                )}
               </div>
             </>
           )}
