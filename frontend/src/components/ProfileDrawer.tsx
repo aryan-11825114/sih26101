@@ -30,3 +30,6 @@ export const ProfileDrawer: React.FC<ProfileDrawerProps> = ({
     />
   );
 };
+
+export { LearningHoursTracker } from './LearningHoursTracker';
+export { ActivityHeatmap } from './ActivityHeatmap';

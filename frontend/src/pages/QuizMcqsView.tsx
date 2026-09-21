@@ -38,6 +38,7 @@ import {
 import confetti from 'canvas-confetti';
 import { StudentProfile } from '../types';
 import { generateAiQuiz, GeneratedQuizTopic, mintPassportRecord } from '../services/api';
+import { SkillAssessmentView } from './SkillAssessmentView';
 
 interface DynamicTrackBlueprint {
   id: string;
@@ -157,9 +158,26 @@ interface UploadedImage {
 interface QuizMcqsViewProps {
   student: StudentProfile | null;
   onShowToast: (msg: string, type?: 'success' | 'info' | 'error') => void;
+  onNavigateTab?: (tab: string) => void;
+  initialSubTab?: 'quiz' | 'assessment';
+  onScoreUpdated?: () => void;
 }
 
-export const QuizMcqsView: React.FC<QuizMcqsViewProps> = ({ student, onShowToast }) => {
+export const QuizMcqsView: React.FC<QuizMcqsViewProps> = ({ 
+  student, 
+  onShowToast, 
+  onNavigateTab,
+  initialSubTab = 'quiz',
+  onScoreUpdated 
+}) => {
+  const [activeSubTab, setActiveSubTab] = useState<'quiz' | 'assessment'>(initialSubTab);
+
+  useEffect(() => {
+    if (initialSubTab) {
+      setActiveSubTab(initialSubTab);
+    }
+  }, [initialSubTab]);
+
   const [activeQuiz, setActiveQuiz] = useState<GeneratedQuizTopic | null>(null);
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const [userAnswers, setUserAnswers] = useState<{ [key: string]: number }>({});
@@ -496,8 +514,64 @@ export const QuizMcqsView: React.FC<QuizMcqsViewProps> = ({ student, onShowToast
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#17133B] via-[#2D1254] to-[#0F172A] p-6 sm:p-8 border border-purple-500/20 shadow-xl">
+      {/* Top Level Mode Switcher: AI Practice Quizzes vs Benchmark Skill Assessments */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/10">
+        <div className="inline-flex p-1.5 rounded-2xl bg-[#0B0F2A] border border-white/10 shadow-lg">
+          <button
+            id="tab-btn-quiz"
+            onClick={() => setActiveSubTab('quiz')}
+            className={`flex items-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              activeSubTab === 'quiz'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Sparkles className={`w-4 h-4 ${activeSubTab === 'quiz' ? 'text-purple-200' : 'text-purple-400'}`} />
+            <span>AI Quiz & MCQs</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-400/20 text-purple-200 font-semibold">
+              Dynamic
+            </span>
+          </button>
+
+          <button
+            id="tab-btn-assessment"
+            onClick={() => setActiveSubTab('assessment')}
+            className={`flex items-center gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              activeSubTab === 'assessment'
+                ? 'bg-gradient-to-r from-[#7C5CFC] to-[#00D9FF] text-white shadow-lg shadow-cyan-500/25'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Award className={`w-4 h-4 ${activeSubTab === 'assessment' ? 'text-cyan-100' : 'text-cyan-400'}`} />
+            <span>Skill Assessment</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-400/20 text-cyan-200 font-semibold">
+              Benchmark
+            </span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>
+            {activeSubTab === 'quiz' 
+              ? 'Real-Time Multimodal Quizzes from Notes, Photos & Custom Tracks' 
+              : 'Standardized Industry Skill Calibrations & Verifications'}
+          </span>
+        </div>
+      </div>
+
+      {/* Render selected portion */}
+      {activeSubTab === 'assessment' ? (
+        <SkillAssessmentView
+          student={student}
+          onNavigateTab={onNavigateTab || (() => {})}
+          onSkillUpdated={onScoreUpdated}
+          onScoreUpdated={onScoreUpdated}
+        />
+      ) : (
+        <>
+          {/* Top Banner */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#17133B] via-[#2D1254] to-[#0F172A] p-6 sm:p-8 border border-purple-500/20 shadow-xl">
         <div className="absolute right-4 -bottom-6 opacity-10 pointer-events-none">
           <Trophy className="w-64 h-64 text-purple-300" />
         </div>
@@ -1447,6 +1521,8 @@ export const QuizMcqsView: React.FC<QuizMcqsViewProps> = ({ student, onShowToast
             </form>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
