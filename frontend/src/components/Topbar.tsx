@@ -106,11 +106,7 @@ export const Topbar: React.FC<TopbarProps> = ({
           </button>
         )}
 
-        {/* Project ID Badge */}
-        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-950/60 border border-indigo-500/30 text-indigo-300 text-xs font-bold tracking-wide shadow-sm shrink-0">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-          <span>Project ID: sih26101 - Smart India Hackathon</span>
-        </div>
+        {/* TOP HEADER - LEFT AVATAR ICON */}
         <div
           onClick={onOpenProfile}
           className="w-9 h-9 min-w-[36px] min-h-[36px] max-w-[36px] max-h-[36px] rounded-full flex items-center justify-center overflow-hidden shrink-0 cursor-pointer shadow-sm hover:ring-2 hover:ring-[#7C5CFC]/50 transition-all bg-[#E5E7EB]"

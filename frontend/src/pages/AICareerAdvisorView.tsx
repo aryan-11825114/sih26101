@@ -44,10 +44,10 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
     {
       id: 'm1',
       sender: 'ai',
-      text: `Hello Adarsh Pratap Singh! I am your updated AI Career Advisor (running on Gemini 3.8). Based on your iGOT verified Skill-DNA (Python, SQL, React), you are at 74% Industry Readiness for 'iGOT-Aligned Full Stack Software Engineer' roles. How can I guide your iGOT upskilling and career roadmap today?`,
+      text: `Hello ${student?.name || 'Adarsh'}! I am your AI Career Advisor. Based on your verified Skill Twin DNA (Python L5, PostgreSQL L4, React L3), you are currently at 74% Industry Readiness for Full Stack Software Engineer roles. How can I help guide your placement roadmap today?`,
       timestamp: 'Just now',
       suggestedAction: {
-        label: 'View iGOT Skill-Gap Summary →',
+        label: 'View Skill Gap Summary',
         tab: 'skill-gap'
       }
     }
@@ -126,26 +126,9 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1.5 rounded-xl">
-            ⚡ Model: Gemini 3.8 Karmayogi Engine
+            ⚡ Model: Gemini 2.5 Pro Career Engine
           </span>
         </div>
-      </div>
-
-      {/* Feature Notification Card / Announcement Banner */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/80 via-purple-950/60 to-[#0E1538] border border-indigo-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
-        <div className="space-y-0.5">
-          <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            Update: Gemini 3.8 enhances reasoning and iGOT course recommendation accuracy.
-          </span>
-          <p className="text-[11px] text-slate-400">Synchronized with MoSPI & National Competency Frameworks.</p>
-        </div>
-        <button
-          onClick={() => handleSendPrompt("Generate an iGOT upskilling path")}
-          className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5 shrink-0 cursor-pointer"
-        >
-          <span>Try 'Generate an iGOT upskilling path' (Gemini 3.8 optimized) →</span>
-        </button>
       </div>
 
       {/* Suggested Fast Query Chips */}
@@ -235,7 +218,7 @@ export const AICareerAdvisorView: React.FC<AICareerAdvisorViewProps> = ({
             type="text"
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
-            placeholder="Ask about iGOT eligibility, upskilling paths, or career roadmaps..."
+            placeholder="Ask about placement eligibility, interview roadmaps, skill priorities..."
             className="flex-1 px-4 py-2.5 rounded-xl bg-[#070B1E] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-[#7C5CFC]"
           />
           <button
